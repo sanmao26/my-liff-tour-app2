@@ -1,141 +1,93 @@
-<!doctype html>
-<html lang="th">
+<!DOCTYPE html>
+<html>
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>LIFF Flex on GitHub Pages</title>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover"
+    />
+    <title>My LIFF App</title>
     <style>
-      :root { color-scheme: light dark; }
-      body{font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-           margin:0; padding:32px; display:grid; place-items:start; gap:16px; max-width:720px}
-      header{display:flex; align-items:center; gap:12px}
-      h1{font-size:clamp(20px,3.6vw,28px); margin:0}
-      .card{border:1px solid #e5e7eb22; border-radius:16px; padding:16px; box-shadow:0 6px 20px #0001}
-      button{padding:12px 16px; border-radius:12px; border:0; cursor:pointer; font-weight:600}
-      .primary{background:#06c755; color:white}
-      .ghost{background:transparent; border:1px solid #cbd5e1}
-      code, .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace}
-      .row{display:flex; gap:8px; flex-wrap:wrap}
-      .hint{opacity:.8; font-size:14px}
+      body {
+        padding: 256px;
+      }
+      button {
+        display: none;
+        width: 50%;
+        padding: 16px 0;
+        margin: 16px auto;
+      }
     </style>
   </head>
   <body>
-    <header>
-      <img src="https://scdn.line-apps.com/n/channel_devcenter/img/line-icon-196x196.png" width="36" height="36" alt="LINE">
-      <h1>แชร์ Flex Message ผ่าน LIFF (GitHub Pages)</h1>
-    </header>
-
-    <div class="card">
-      <p>ตัวอย่างหน้าเว็บสำหรับ <strong>Share Target Picker</strong>. แก้ไขตัวแปร <span class="mono">LIFF_ID</span> ให้เป็นของคุณ แล้วเปิดลิงก์นี้ <strong>จากใน LINE</strong> เพื่อทดสอบ.</p>
-      <div class="row">
-        <button id="btnLogin" class="ghost">Log in</button>
-        <button id="btnShare" class="primary">Share Flex</button>
-        <button id="btnLogout" class="ghost">Log out</button>
-      </div>
-      <p class="hint" id="env"></p>
-      <p class="hint">หากกดแชร์ไม่ได้ ให้ตรวจสอบว่าเปิดใน LINE, และ LIFF app เปิด scope <code>chat_message.write</code>.</p>
-    </div>
-
+    <button id="btnShare" onclick="sendShare()">Share Target Picker</button>
+    <button id="btnLogin" onclick="liff.login()">Log In</button>
+    <button id="btnLogOut" onclick="logOut()">Log Out</button>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script>
-      const LIFF_ID = "YOUR_LIFF_ID"; // ← ใส่ LIFF ID จริงของคุณ
-
-      const $ = (id) => document.getElementById(id);
-
-      function getFlexContent(){
-        // ตัวอย่าง Flex Bubble โปรโมททัวร์ — แก้ไขตามต้องการ
-        return {
-          type: "bubble",
-          hero: {
-            type: "image",
-            url: "https://picsum.photos/800/533",
-            size: "full",
-            aspectRatio: "3:2",
-            aspectMode: "cover"
+      async function sendShare() {
+        const result = await liff.shareTargetPicker([
+          {
+            type: "flex",
+            altText:
+              "🔥ลดทั้งเดือน เพียง 19,999💥ญี่ปุ่น โตเกียว ซัมเมอร์ ฟีลดี...คุ้มครบ จบในทริปเดียว!",
+            contents: {
+  "type": "bubble",
+  "size": "giga",
+  "hero": {
+    "type": "image",
+    "url": "https://i.postimg.cc/RhtqmRHv/SL-31-68.jpg",
+    "size": "full",
+    "aspectRatio": "3:4",
+    "aspectMode": "cover",
+    "action": {
+      "type": "uri",
+      "uri": "https://www.probookingcenter.com/tours/japan"
+    }
+  }
+}
+          
           },
-          body: {
-            type: "box",
-            layout: "vertical",
-            spacing: "md",
-            contents: [
-              { type: "text", text: "PVN-PQC30-VZ ฟูก๊วก", weight: "bold", size: "lg", wrap: true },
-              { type: "text", text: "VIN WONDERS + Sunworld Hon Thom", size: "sm", color: "#6b7280", wrap: true },
-              { type: "separator", margin: "md" },
-              {
-                type: "box", layout: "baseline", spacing: "sm",
-                contents: [
-                  { type: "text", text: "ราคา", color: "#6b7280", size: "sm", flex: 2 },
-                  { type: "text", text: "11,999 บาท", weight: "bold", size: "md", flex: 5, wrap: true }
-                ]
-              },
-              {
-                type: "box", layout: "vertical", margin: "md", spacing: "sm",
-                contents: [
-                  { type: "text", text: "🌴 น้ำทะเลใส วิวสวยเหมือนมัลดีฟส์", size: "sm", wrap: true },
-                  { type: "text", text: "🎢 รวมบัตร 2 สวนสนุกสุดมันส์", size: "sm", wrap: true }
-                ]
-              }
-            ]
-          },
-          footer: {
-            type: "box",
-            layout: "vertical",
-            spacing: "md",
-            contents: [
-              {
-                type: "button", style: "primary", color: "#06c755",
-                action: { type: "uri", label: "ดูโปรแกรม", uri: "https://example.com/program" }
-              },
-              {
-                type: "button", style: "secondary",
-                action: { type: "uri", label: "แชทสอบถาม", uri: "https://lin.ee/" }
-              }
-            ]
+          
+  
+          
+        ]);
+        if (result) {
+          alert(`[${result.status}] Message sent!`);
+        } else {
+          const [majorVer, minorVer, patchVer] = (
+            liff.getLineVersion() || ""
+          ).split(".");
+
+          if (minorVer === undefined) {
+            alert("ShareTargetPicker was canceled in external browser");
+            return;
           }
-        };
-      }
 
-      async function main(){
-        try{
-          await liff.init({ liffId: 2006670623-79XEraMq });
-        }catch(err){
-          alert("liff.init failed: " + (err?.message || err));
-          return;
+          if (
+            parseInt(majorVer) >= 10 &&
+            parseInt(minorVer) >= 10 &&
+            parseInt(patchVer) > 0
+          ) {
+            alert("ShareTargetPicker was canceled in LINE app");
+          }
         }
-
-        const inClient = liff.isInClient();
-        const loggedIn = liff.isLoggedIn();
-        $("env").textContent = `inClient=${inClient} | loggedIn=${loggedIn}`;
-
-        $("btnLogin").onclick = () => liff.login();
-        $("btnLogout").onclick = () => { liff.logout(); location.reload(); };
-
-        $("btnShare").onclick = async () => {
-          if (!inClient){
-            alert("กรุณาเปิดลิงก์นี้จากใน LINE เพื่อใช้งาน Share Target Picker");
-            return;
-          }
-          if (!liff.isApiAvailable("shareTargetPicker")){
-            alert("อุปกรณ์นี้ไม่รองรับ shareTargetPicker");
-            return;
-          }
-          try{
-            await liff.shareTargetPicker([{
-              type: "flex",
-              altText: "โปรโมททัวร์สุดคุ้ม!",
-              contents: getFlexContent()
-            }]);
-          }catch(err){
-            alert("แชร์ไม่สำเร็จ: " + (err?.message || err));
-          }
-        };
-
-        // UI state
-        $("btnLogin").style.display = loggedIn ? "none" : "inline-block";
-        $("btnLogout").style.display = loggedIn ? "inline-block" : "none";
-        $("btnShare").style.display = "inline-block";
       }
-
+      function logOut() {
+        liff.logout();
+        window.location.reload();
+      }
+      async function main() {
+        await liff.init({ liffId: "2006670623-79XEraMq" });
+        if (liff.isLoggedIn()) {
+          document.getElementById("btnShare").style.display = "block";
+          if (!liff.isInClient()) {
+            document.getElementById("btnLogOut").style.display = "block";
+          }
+        } else {
+          document.getElementById("btnLogin").style.display = "block";
+        }
+      }
       main();
     </script>
   </body>

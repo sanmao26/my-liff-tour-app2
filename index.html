@@ -1,193 +1,70 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0,viewport-fit=cover"
-    />
-    <title>My LIFF App</title>
-    <style>
-      body {
-        padding: 256px;
-      }
-      button {
-        display: none;
-        width: 50%;
-        padding: 16px 0;
-        margin: 16px auto;
-      }
-    </style>
-  </head>
-  <body>
-    <button id="btnShare" onclick="sendShare()">Share Target Picker</button>
-    <button id="btnLogin" onclick="liff.login()">Log In</button>
-    <button id="btnLogOut" onclick="logOut()">Log Out</button>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flex Message Sender</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen font-sans">
+
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl flex flex-col">
+        
+        <div class="bg-[#06c755] p-4 text-white flex justify-between items-center shadow-md">
+            <h1 class="font-bold text-lg"><i class="fab fa-line mr-2"></i>Flex Sender Tool</h1>
+            <div id="statusBadge" class="text-xs bg-red-500 px-2 py-1 rounded-full">Not Connected</div>
+        </div>
+
+        <div class="p-4 flex-1 flex flex-col gap-4">
+            
+            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                <label class="text-xs font-bold text-blue-800 block mb-1">1. LIFF ID (ของคุณ)</label>
+                <div class="flex gap-2">
+                    <input type="text" id="liffIdInput" placeholder="200xxxxxxx-xxxxxxx" 
+                        class="flex-1 border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#06c755]">
+                    <button onclick="connectLiff()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">เชื่อมต่อ</button>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="text-sm font-bold text-gray-700">2. วางโค้ด JSON ที่นี่</label>
+                    <div class="space-x-2">
+                        <button onclick="loadJapanTour()" class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded border border-orange-200 hover:bg-orange-200">
+                            🇯🇵 โหลดโปรญี่ปุ่น
+                        </button>
+                        <button onclick="clearInput()" class="text-xs text-gray-400 underline">ล้างค่า</button>
+                    </div>
+                </div>
+                <textarea id="jsonInput" class="flex-1 w-full border border-gray-300 rounded p-2 text-xs font-mono resize-none focus:border-[#06c755] focus:ring-1 focus:ring-[#06c755]" 
+                    placeholder='{"type": "flex", ...}'></textarea>
+            </div>
+
+            <button id="sendBtn" onclick="sendFlex()" disabled 
+                class="w-full bg-gray-300 text-white font-bold py-4 rounded shadow transition-all flex justify-center items-center gap-2 cursor-not-allowed">
+                <span>กรุณาเชื่อมต่อ LIFF ก่อน</span>
+            </button>
+
+        </div>
+    </div>
+
     <script>
-      async function sendShare() {
-        const result = await liff.shareTargetPicker([
-          {
-            type: "flex",
-            altText:
-              "🔥รวมโปรญี่ปุ่น โตเกียว ฟีลดี...คุ้มครบ จบในทริปเดียว ✅เริ่ม 23,999 บาท! จองเลย ✨",
-            contents: {
-  "type": "bubble",
-  "size": "giga",
-  "hero": {
-    "type": "image",
-    "url": "https://i.postimg.cc/9QK80cTC/49842843731-41506214783-1747639625-988650243-f.jpg",
-    "size": "full",
-    "aspectRatio": "1:1",
-    "aspectMode": "cover",
-    "action": {
-      "type": "uri",
-      "label": "action",
-      "uri": "https://probookingcenter.com/tours/series/1424"
-    }
-  },
-  "body": {
-    "type": "box",
-    "layout": "vertical",
-    "spacing": "sm",
-    "contents": [
-      {
-        "type": "text",
-        "text": "🆕NEW PROGRAM โตเกียว-นาริตะ 5 วัน 3 คืน",
-        "weight": "bold",
-        "size": "lg",
-        "wrap": true,
-        "color": "#d0021b"
-      },
-      {
-        "type": "text",
-        "text": "เริ่มเพียง 17,999.- เดินทาง พ.ค.–ก.ย. 2025",
-        "size": "sm",
-        "color": "#555555",
-        "wrap": true
-      },
-      {
-        "type": "box",
-        "layout": "vertical",
-        "margin": "md",
-        "spacing": "xs",
-        "contents": [
-          {
-            "type": "text",
-            "text": "✨ ไฮไลต์ทริป ✨",
-            "weight": "bold",
-            "size": "sm",
-            "color": "#000000"
-          },
-          {
-            "type": "text",
-            "text": "🛐 วัดอาซากุสะ + โคมแดงยักษ์",
-            "size": "sm",
-            "wrap": true
-          },
-          {
-            "type": "text",
-            "text": "🗼 ผ่านชม Tokyo Skytree",
-            "size": "sm",
-            "wrap": true
-          },
-          {
-            "type": "text",
-            "text": "🤖 กันดั้มโอไดบะ – หุ่นยนต์ยักษ์",
-            "size": "sm",
-            "wrap": true
-          },
-          {
-            "type": "text",
-            "text": "🛍 ช้อป Shinjuku + AEON Mall",
-            "size": "sm",
-            "wrap": true
-          },
-          {
-            "type": "text",
-            "text": "🎌 พิพิธภัณฑ์โบโซโนมูระ",
-            "size": "sm",
-            "wrap": true
-          },
-          {
-            "type": "text",
-            "text": "🎠 Free Day เลือกเที่ยว Disneyland",
-            "size": "sm",
-            "wrap": true
-          }
-        ]
-      }
-    ]
-  },
-  "footer": {
-    "type": "box",
-    "layout": "vertical",
-    "spacing": "sm",
-    "contents": [
-      {
-        "type": "button",
-        "style": "primary",
-        "color": "#d0021b",
-        "action": {
-          "type": "uri",
-          "label": "ดูรายละเอียด / จอง",
-          "uri": "https://probookingcenter.com/tours/series/1424"
-        }
-      },
-      {
-        "type": "button",
-        "style": "link",
-        "action": {
-          "type": "uri",
-          "label": "แชทสอบถามเพิ่มเติม",
-          "uri": "https://rb.gy/uq1aeo"
-        }
-      }
-    ]
-  }
-}
-          },
-          
+        // ใส่ LIFF ID ล่าสุดของคุณที่นี่ (หรือจะไปกรอกหน้าเว็บก็ได้)
+        const DEFAULT_LIFF_ID = "2006670623-79XEraMq"; 
 
-          
-        ]);
-        if (result) {
-          alert(`[${result.status}] Message sent!`);
-        } else {
-          const [majorVer, minorVer, patchVer] = (
-            liff.getLineVersion() || ""
-          ).split(".");
-
-          if (minorVer === undefined) {
-            alert("ShareTargetPicker was canceled in external browser");
-            return;
-          }
-
-          if (
-            parseInt(majorVer) >= 10 &&
-            parseInt(minorVer) >= 10 &&
-            parseInt(patchVer) > 0
-          ) {
-            alert("ShareTargetPicker was canceled in LINE app");
-          }
+        window.onload = function() {
+            // ดึงค่าเก่ามาแสดง
+            const savedLiffId = localStorage.getItem('my_liff_id') || DEFAULT_LIFF_ID;
+            document.getElementById('liffIdInput').value = savedLiffId;
+            
+            // ถ้ามี ID อยู่แล้ว ให้ลองเชื่อมต่อเลย
+            if(savedLiffId) connectLiff();
         }
-      }
-      function logOut() {
-        liff.logout();
-        window.location.reload();
-      }
-      async function main() {
-        await liff.init({ liffId: "2006670623-79XEraMq" });
-        if (liff.isLoggedIn()) {
-          document.getElementById("btnShare").style.display = "block";
-          if (!liff.isInClient()) {
-            document.getElementById("btnLogOut").style.display = "block";
-          }
-        } else {
-          document.getElementById("btnLogin").style.display = "block";
-        }
-      }
-      main();
-    </script>
-  </body>
-</html>
+
+        async function connectLiff() {
+            const liffId = document.getElementById('liffIdInput').value.trim();
+            if (!liffId) return alert("กรุณาใส่ LIFF ID");
+
+            localStorage.setItem('my_liff_id', liffId

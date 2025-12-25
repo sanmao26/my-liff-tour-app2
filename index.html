@@ -3,68 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flex Message Sender</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>LIFF Debugger</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f0f0f0; text-align: center; }
+        .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
+        button { width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .btn-green { background-color: #06c755; color: white; }
+        .btn-red { background-color: #ff4d4f; color: white; }
+        .status { margin-top: 10px; font-size: 14px; color: #666; }
+        textarea { width: 90%; height: 100px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; }
+    </style>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 min-h-screen font-sans">
+<body>
 
-    <div class="max-w-md mx-auto bg-white min-h-screen shadow-xl flex flex-col">
+    <div class="box">
+        <h3>🔧 ตัวแก้ปัญหาการเชื่อมต่อ</h3>
+        <p class="status" id="debugLog">สถานะ: รอการเชื่อมต่อ...</p>
         
-        <div class="bg-[#06c755] p-4 text-white flex justify-between items-center shadow-md">
-            <h1 class="font-bold text-lg"><i class="fab fa-line mr-2"></i>Flex Sender Tool</h1>
-            <div id="statusBadge" class="text-xs bg-red-500 px-2 py-1 rounded-full">Not Connected</div>
-        </div>
+        <label>LIFF ID:</label>
+        <input type="text" id="liffIdInput" placeholder="200xxxxxxx-xxxxxxx">
+        
+        <button onclick="startConnect()" class="btn-green">1. กดเชื่อมต่อ (Connect)</button>
+        <button onclick="resetSystem()" class="btn-red">2. ล้างค่าทั้งหมด (Reset)</button>
+    </div>
 
-        <div class="p-4 flex-1 flex flex-col gap-4">
-            
-            <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                <label class="text-xs font-bold text-blue-800 block mb-1">1. LIFF ID (ของคุณ)</label>
-                <div class="flex gap-2">
-                    <input type="text" id="liffIdInput" placeholder="200xxxxxxx-xxxxxxx" 
-                        class="flex-1 border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-[#06c755]">
-                    <button onclick="connectLiff()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">เชื่อมต่อ</button>
-                </div>
-            </div>
-
-            <div class="flex-1 flex flex-col">
-                <div class="flex justify-between items-end mb-2">
-                    <label class="text-sm font-bold text-gray-700">2. วางโค้ด JSON ที่นี่</label>
-                    <div class="space-x-2">
-                        <button onclick="loadJapanTour()" class="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded border border-orange-200 hover:bg-orange-200">
-                            🇯🇵 โหลดโปรญี่ปุ่น
-                        </button>
-                        <button onclick="clearInput()" class="text-xs text-gray-400 underline">ล้างค่า</button>
-                    </div>
-                </div>
-                <textarea id="jsonInput" class="flex-1 w-full border border-gray-300 rounded p-2 text-xs font-mono resize-none focus:border-[#06c755] focus:ring-1 focus:ring-[#06c755]" 
-                    placeholder='{"type": "flex", ...}'></textarea>
-            </div>
-
-            <button id="sendBtn" onclick="sendFlex()" disabled 
-                class="w-full bg-gray-300 text-white font-bold py-4 rounded shadow transition-all flex justify-center items-center gap-2 cursor-not-allowed">
-                <span>กรุณาเชื่อมต่อ LIFF ก่อน</span>
-            </button>
-
-        </div>
+    <div class="box" id="sendSection" style="display:none;">
+        <h3>✅ เชื่อมต่อสำเร็จ!</h3>
+        <textarea id="jsonInput" placeholder="วาง JSON ที่นี่"></textarea>
+        <button onclick="loadSample()" style="background:#eee; color:#333;">โหลดตัวอย่าง</button>
+        <br><br>
+        <button onclick="sendFlex()" class="btn-green">ส่งข้อความ (Send)</button>
     </div>
 
     <script>
-        // ใส่ LIFF ID ล่าสุดของคุณที่นี่ (หรือจะไปกรอกหน้าเว็บก็ได้)
-        const DEFAULT_LIFF_ID = "2006670623-79XEraMq"; 
+        // 1. ใส่ LIFF ID ของคุณตรงนี้เพื่อความสะดวก
+        const MY_LIFF_ID = "2006670623-79XEraMq"; 
 
+        // เริ่มทำงานเมื่อโหลดหน้าเว็บ
         window.onload = function() {
-            // ดึงค่าเก่ามาแสดง
-            const savedLiffId = localStorage.getItem('my_liff_id') || DEFAULT_LIFF_ID;
-            document.getElementById('liffIdInput').value = savedLiffId;
+            log("โหลดหน้าเว็บเสร็จสิ้น (v1.0)");
             
-            // ถ้ามี ID อยู่แล้ว ให้ลองเชื่อมต่อเลย
-            if(savedLiffId) connectLiff();
+            // ดึงค่าเก่ามาใส่ช่อง (ถ้ามี)
+            let savedId = localStorage.getItem('debug_liff_id');
+            if(!savedId) savedId = MY_LIFF_ID;
+            document.getElementById('liffIdInput').value = savedId;
         }
 
-        async function connectLiff() {
+        async function startConnect() {
             const liffId = document.getElementById('liffIdInput').value.trim();
-            if (!liffId) return alert("กรุณาใส่ LIFF ID");
+            if(!liffId) return alert("กรุณาใส่ LIFF ID");
 
-            localStorage.setItem('my_liff_id', liffId
+            log("กำลังเชื่อมต่อกับ: " + liffId + " ...");
+            localStorage.setItem('debug_liff_id', liffId);
+
+            try {
+                // ขั้นตอน Init
+                await liff.init({ liffId: liffId });
+                log("LIFF Init สำเร็จ!");
+
+                // ขั้นตอน Login
+                if (!liff.isLoggedIn()) {
+                    log("ยังไม่ได้ Login... กำลังสั่ง Login");
+                    liff.login();
+                    return;
+                }
+
+                // สำเร็จทุกอย่าง
+                log("Login แล้ว! ชื่อ: " + (await liff.getProfile()).displayName);
+                document.getElementById('sendSection').style.display = 'block';
+
+            } catch (err) {
+                // แจ้งเตือนเมื่อพัง
+                alert("❌ เชื่อมต่อไม่ได้!\n\nError: " + err.message + "\n\n(ลองกดปุ่มสีแดง 'ล้างค่า' แล้วลองใหม่)");
+                log("Error: " + err.message);
+            }
+        }
+
+        function resetSystem() {
+            if(confirm("ต้องการล้างค่าและรีเฟรชใหม่?")) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+
+        async function sendFlex() {
+            const jsonStr = document.getElementById('jsonInput').value;
+            if(!jsonStr) return alert("ไม่มี JSON");
+
+            try {
+                let msg = JSON.parse(jsonStr);
+                // Auto-fix
+                if(msg.type === 'bubble') msg = { type: 'flex', altText: 'Flex', contents: msg };
+
+                if (!liff.isApiAvailable('shareTargetPicker')) {
+                    alert("ฟีเจอร์นี้ต้องใช้บนมือถือเท่านั้น");
+                    return;
+                }
+
+                const res = await liff.shareTargetPicker([msg]);
+                if(res) {
+                    alert("ส่งสำเร็จ!");
+                    liff.closeWindow();
+                }
+            } catch(e) {
+                alert("JSON ผิด: " + e.message);
+            }
+        }
+
+        function loadSample() {
+            const sample = { type: "flex", altText: "Test", contents: { type: "bubble", body: { type: "box", layout: "vertical", contents: [{ type: "text", text: "Work!" }] } } };
+            document.getElementById('jsonInput').value = JSON.stringify(sample);
+        }
+
+        function log(msg) {
+            document.getElementById('debugLog').innerText = msg;
+            console.log(msg);
+        }
+    </script>
+</body>
+</html>

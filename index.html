@@ -3,32 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hybrid Flex Sender</title>
+    <title>Flex Message Universal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .hidden { display: none !important; }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans flex items-center justify-center p-4">
+<body class="bg-slate-100 min-h-screen font-sans flex items-center justify-center">
 
-    <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col min-h-[600px]">
+    <div class="w-full max-w-md bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-2xl overflow-hidden flex flex-col">
         
         <div class="bg-[#06c755] p-4 text-white flex justify-between items-center">
-            <h1 class="font-bold text-lg"><i class="fab fa-line mr-2"></i>Flex Sender <span id="modeBadge" class="text-xs bg-white text-[#06c755] px-2 py-0.5 rounded ml-2">Loading...</span></h1>
+            <h1 class="font-bold text-lg"><i class="fab fa-line mr-2"></i>Flex Sender</h1>
+            <div id="userStatus" class="text-xs bg-white/20 px-2 py-1 rounded">Guest</div>
         </div>
 
-        <div class="p-6 flex-1 flex flex-col gap-4">
+        <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-8 text-center hidden">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-user-lock text-3xl text-gray-400"></i>
+            </div>
+            <h2 class="text-xl font-bold text-gray-700 mb-2">กรุณาเข้าสู่ระบบ</h2>
+            <p class="text-sm text-gray-500 mb-6">เชื่อมต่อกับ LINE เพื่อใช้งานเครื่องมือส่งข้อความ</p>
+            
+            <button onclick="liff.login()" class="w-full bg-[#06c755] hover:bg-[#05b34c] text-white font-bold py-3 rounded-lg shadow-lg transition-transform transform hover:scale-105 flex justify-center items-center gap-2">
+                <i class="fab fa-line text-2xl"></i> Log in with LINE
+            </button>
+        </div>
 
-            <div id="webSettings" class="hidden bg-orange-50 p-4 rounded-lg border border-orange-200">
-                <h3 class="font-bold text-orange-800 mb-2"><i class="fas fa-laptop"></i> โหมดส่งจากคอมพิวเตอร์</h3>
-                <div class="space-y-2">
-                    <input type="password" id="accessToken" placeholder="Channel Access Token (รหัสบอทยาวๆ)" 
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#06c755]">
-                    <input type="text" id="userId" placeholder="User ID ผู้รับ (Uxxxxxxxx...)" 
-                        class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#06c755]">
+        <div id="appScreen" class="flex-1 flex flex-col p-4 gap-4 hidden">
+            
+            <div class="flex items-center gap-3 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                <img id="profileImg" src="" class="w-12 h-12 rounded-full border-2 border-white shadow-sm">
+                <div>
+                    <p class="text-xs text-gray-500">ส่งในนาม</p>
+                    <p id="profileName" class="font-bold text-gray-800 text-sm">...</p>
                 </div>
-                <p class="text-[10px] text-red-500 mt-2">*หมายเหตุ: ถ้าส่งไม่ไป ให้ติดตั้ง Chrome Extension ชื่อ "Allow CORS" แล้วเปิดใช้งาน</p>
+                <button onclick="logout()" class="ml-auto text-xs text-red-500 underline">ออก</button>
             </div>
 
-            <div id="mobileSettings" class="hidden bg-blue-50 p-4 rounded-lg border border-blue-200">
-                <h3 class="font-bold text-blue-800 mb-2"><i class="fas fa-mobile-alt"></i> โหมดมือถือ (LIFF)</h3>
-                <div class="flex items-center gap-
+            <div class="flex-1 flex flex-col">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="text-sm font-bold text-gray-700">JSON Flex Message</label>
+                    <div class="space-x-1">
+                        <button onclick="loadJapanTour()" class="text-[10px] bg-orange-100 text-orange-800 px-2 py-1 rounded border border-orange-200">🇯🇵 โปรญี่ปุ่น</button>
+                        <button onclick="clearJson()" class="text-[10px] bg-gray-200 text-gray-600 px-2 py-1 rounded">ล้าง</button>
+                    </div>
+                </div>
+                <textarea id="jsonInput" class="flex-1 w-full border border-gray-300 rounded p-3 text-xs font-mono resize-none focus:border-[#06c755] focus:ring-1 focus:ring-[#06c755] h-48" 
+                    placeholder='วางโค้ด JSON ที่นี่...'></textarea>
+            </div>
+
+            <button onclick="sendFlex()" class="w-full bg-[#06c755] hover:bg-[#05b34c] text-white font-bold py-4 rounded-lg shadow-lg text-lg flex justify-center items-center gap-2">
+                <i class="fas fa-paper-plane"></i> เลือกเพื่อนและส่งเลย
+            </button>
+        </div>
+
+        <div id="loadingScreen" class="flex-1 flex flex-col items-center justify-center p-8">
+            <i class="fas fa-circle-notch fa-spin text-4xl text-[#06c755] mb-4"></i>
+            <p class="text-gray-400 text-sm">กำลังเชื่อมต่อ LINE...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // 🚨 ใส่ LIFF ID ของคุณที่นี่
+        const MY_LIFF_ID = "2006670623-79XEraMq";
+
+        window.onload = async function() {
+            try {
+                await liff.init({ liffId: MY_LIFF_ID });
+
+                // เช็คสถานะการ Login
+                if (liff.isLoggedIn()) {
+                    // ถ้า Login อยู่แล้ว (เช่นเปิดใน LINE) -> ไปหน้าแอปเลย
+                    displayApp();
+                } else {
+                    // ถ้ายังไม่ Login (เช่นเปิดใน Chrome) -> โชว์หน้าปุ่ม Login
+                    // ⚠️ เราจะไม่สั่ง liff.login() อัตโนมัติที่นี่ เพื่อป้องกัน Loop นรก
+                    displayLogin();
+                }
+            } catch (err) {
+                alert("เกิดข้อผิดพลาด: " + err.message);
+                // ถ้าพังจริงๆ ให้โชว์ปุ่ม Login เผื่อกดใหม่ได้
+                displayLogin();
+            }
+        };
+
+        async function displayApp() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+
+            // ดึงข้อมูลโปรไฟล์มาโชว์
+            try {
+                const profile = await liff.getProfile();
+                document.getElementById('profileName').innerText = profile.displayName;
+                document.getElementById('profileImg').src = profile.pictureUrl;
+                document.getElementById('userStatus').innerText = "Active";
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function displayLogin() {
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function logout() {
+            liff.logout();
+            window.location.reload();
+        }
+
+        function clearJson() {
+            document.getElementById('jsonInput').value = '';
+        }
+
+        async function sendFlex() {
+            const jsonStr = document.getElementById('jsonInput').value;
+            if (!jsonStr) return alert("กรุณาวาง JSON ก่อนครับ");
+
+            try {
+                let msg = JSON.parse(jsonStr);
+                // Auto-Fix: เติม flex wrapper ให้ถ้าลืม
+                if (msg.type === "bubble" || msg.type === "carousel") {
+                    msg = { type: "flex", altText: "Flex Message", contents: msg };
+                }
+
+                if (!liff.isApiAvailable('shareTargetPicker')) {
+                    alert("ฟีเจอร์นี้ต้องใช้บนแอป LINE ในมือถือเท่านั้นครับ");
+                    return;
+                }
+
+                const res = await liff.shareTargetPicker([msg]);
+                if (res) liff.closeWindow();
+
+            } catch (e) {
+                alert("JSON ผิดพลาด: " + e.message);
+            }
+        }
+
+        function loadJapanTour() {
+            const sample = {
+                "type": "flex",
+                "altText": "🔥รวมโปรญี่ปุ่น สุดคุ้ม!",
+                "contents": {
+                    "type": "bubble",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://i.postimg.cc/9QK80cTC/49842843731-41506214783-1747639625-988650243-f.jpg",
+                        "size": "full",
+                        "aspectRatio": "20:13",
+                        "aspectMode": "cover",
+                        "action": { "type": "uri", "uri": "https://line.me/" }
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            { "type": "text", "text": "ทัวร์ญี่ปุ่น 5 วัน 3 คืน", "weight": "bold", "size": "xl" },
+                            { "type": "text", "text": "เริ่ม 17,999 บาท", "color": "#ff5555", "size": "sm" }
+                        ]
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            { "type": "button", "style": "primary", "color": "#06c755", "action": { "type": "uri", "label": "จองเลย", "uri": "https://line.me/" } }
+                        ]
+                    }
+                }
+            };
+            document.getElementById('jsonInput').value = JSON.stringify(sample, null, 2);
+        }
+    </script>
+</body>
+</html>

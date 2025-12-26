@@ -3,124 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LIFF Debugger</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f0f0f0; text-align: center; }
-        .box { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; font-size: 16px; }
-        button { width: 100%; padding: 15px; margin: 5px 0; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .btn-green { background-color: #06c755; color: white; }
-        .btn-red { background-color: #ff4d4f; color: white; }
-        .status { margin-top: 10px; font-size: 14px; color: #666; }
-        textarea { width: 90%; height: 100px; border: 1px solid #ccc; border-radius: 5px; padding: 10px; }
-    </style>
+    <title>Fixed Flex Sender</title>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 h-screen flex flex-col items-center justify-center p-4">
 
-    <div class="box">
-        <h3>🔧 ตัวแก้ปัญหาการเชื่อมต่อ</h3>
-        <p class="status" id="debugLog">สถานะ: รอการเชื่อมต่อ...</p>
+    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center">
+        <h1 class="text-xl font-bold mb-4 text-[#06c755]">Flex Sender (Reset)</h1>
         
-        <label>LIFF ID:</label>
-        <input type="text" id="liffIdInput" placeholder="200xxxxxxx-xxxxxxx">
-        
-        <button onclick="startConnect()" class="btn-green">1. กดเชื่อมต่อ (Connect)</button>
-        <button onclick="resetSystem()" class="btn-red">2. ล้างค่าทั้งหมด (Reset)</button>
-    </div>
+        <div id="status" class="text-sm text-gray-500 mb-4">กำลังตรวจสอบ...</div>
 
-    <div class="box" id="sendSection" style="display:none;">
-        <h3>✅ เชื่อมต่อสำเร็จ!</h3>
-        <textarea id="jsonInput" placeholder="วาง JSON ที่นี่"></textarea>
-        <button onclick="loadSample()" style="background:#eee; color:#333;">โหลดตัวอย่าง</button>
-        <br><br>
-        <button onclick="sendFlex()" class="btn-green">ส่งข้อความ (Send)</button>
+        <button onclick="forceReset()" class="text-xs text-red-500 underline mb-4">
+            กดตรงนี้ถ้ายัง Error
+        </button>
+
+        <textarea id="jsonInput" class="w-full border p-2 rounded text-xs h-32 mb-4 hidden" placeholder="JSON Code"></textarea>
+        
+        <button id="btnSend" onclick="sendFlex()" class="hidden w-full bg-[#06c755] text-white py-3 rounded font-bold">
+            ส่งข้อความ
+        </button>
+        
+        <button id="btnLogin" onclick="liff.login()" class="hidden w-full bg-[#00c300] text-white py-3 rounded font-bold">
+            Login with LINE
+        </button>
     </div>
 
     <script>
-        // 1. ใส่ LIFF ID ของคุณตรงนี้เพื่อความสะดวก
-        const MY_LIFF_ID = "2006670623-79XEraMq"; 
+        // ✅ ใส่ ID ของคุณตรงนี้
+        const LIFF_ID = "2008776742-meCAFErj";
 
-        // เริ่มทำงานเมื่อโหลดหน้าเว็บ
-        window.onload = function() {
-            log("โหลดหน้าเว็บเสร็จสิ้น (v1.0)");
-            
-            // ดึงค่าเก่ามาใส่ช่อง (ถ้ามี)
-            let savedId = localStorage.getItem('debug_liff_id');
-            if(!savedId) savedId = MY_LIFF_ID;
-            document.getElementById('liffIdInput').value = savedId;
-        }
-
-        async function startConnect() {
-            const liffId = document.getElementById('liffIdInput').value.trim();
-            if(!liffId) return alert("กรุณาใส่ LIFF ID");
-
-            log("กำลังเชื่อมต่อกับ: " + liffId + " ...");
-            localStorage.setItem('debug_liff_id', liffId);
-
+        async function main() {
             try {
-                // ขั้นตอน Init
-                await liff.init({ liffId: liffId });
-                log("LIFF Init สำเร็จ!");
+                await liff.init({ liffId: LIFF_ID });
 
-                // ขั้นตอน Login
-                if (!liff.isLoggedIn()) {
-                    log("ยังไม่ได้ Login... กำลังสั่ง Login");
-                    liff.login();
-                    return;
+                // ถ้า Login แล้ว
+                if (liff.isLoggedIn()) {
+                    document.getElementById('status').innerText = "พร้อมใช้งาน!";
+                    document.getElementById('jsonInput').classList.remove('hidden');
+                    document.getElementById('btnSend').classList.remove('hidden');
+                    
+                    // โหลดตัวอย่าง
+                    loadSample();
+                } else {
+                    // ถ้ายังไม่ Login
+                    document.getElementById('status').innerText = "กรุณาเข้าสู่ระบบ";
+                    document.getElementById('btnLogin').classList.remove('hidden');
                 }
-
-                // สำเร็จทุกอย่าง
-                log("Login แล้ว! ชื่อ: " + (await liff.getProfile()).displayName);
-                document.getElementById('sendSection').style.display = 'block';
-
             } catch (err) {
-                // แจ้งเตือนเมื่อพัง
-                alert("❌ เชื่อมต่อไม่ได้!\n\nError: " + err.message + "\n\n(ลองกดปุ่มสีแดง 'ล้างค่า' แล้วลองใหม่)");
-                log("Error: " + err.message);
-            }
-        }
-
-        function resetSystem() {
-            if(confirm("ต้องการล้างค่าและรีเฟรชใหม่?")) {
-                localStorage.clear();
-                window.location.reload();
+                // 🚨 ถ้าเจอ Error Permission หรือ Token พัง ให้ล้างทิ้งทันที
+                document.getElementById('status').innerText = "พบปัญหา: " + err.code;
+                if (err.code === "FBD33" || err.message.includes("permission") || err.message.includes("revoked")) {
+                    alert("ระบบกำลังล้างค่าเก่าที่ค้างอยู่... กรุณากด OK");
+                    localStorage.clear();
+                    window.location.reload();
+                } else {
+                    alert("Error: " + err.message + "\n\n(ลองกดปุ่ม 'กดตรงนี้ถ้ายัง Error' ด้านล่าง)");
+                }
             }
         }
 
         async function sendFlex() {
-            const jsonStr = document.getElementById('jsonInput').value;
-            if(!jsonStr) return alert("ไม่มี JSON");
-
             try {
-                let msg = JSON.parse(jsonStr);
-                // Auto-fix
-                if(msg.type === 'bubble') msg = { type: 'flex', altText: 'Flex', contents: msg };
+                const json = JSON.parse(document.getElementById('jsonInput').value);
+                const msg = (json.type === 'flex') ? json : { type: "flex", altText: "Flex", contents: json };
 
                 if (!liff.isApiAvailable('shareTargetPicker')) {
-                    alert("ฟีเจอร์นี้ต้องใช้บนมือถือเท่านั้น");
+                    alert("ต้องเปิดในมือถือเท่านั้น");
                     return;
                 }
 
                 const res = await liff.shareTargetPicker([msg]);
-                if(res) {
-                    alert("ส่งสำเร็จ!");
-                    liff.closeWindow();
-                }
-            } catch(e) {
+                if (res) liff.closeWindow();
+            } catch (e) {
                 alert("JSON ผิด: " + e.message);
             }
         }
 
         function loadSample() {
-            const sample = { type: "flex", altText: "Test", contents: { type: "bubble", body: { type: "box", layout: "vertical", contents: [{ type: "text", text: "Work!" }] } } };
+            const sample = { type: "bubble", body: { type: "box", layout: "vertical", contents: [{ type: "text", text: "ใช้ได้แล้ว!", size: "xl", weight: "bold", align: "center", color: "#06c755" }] } };
             document.getElementById('jsonInput').value = JSON.stringify(sample);
         }
 
-        function log(msg) {
-            document.getElementById('debugLog').innerText = msg;
-            console.log(msg);
+        function forceReset() {
+            localStorage.clear();
+            liff.logout();
+            window.location.reload();
         }
+
+        main();
     </script>
 </body>
 </html>

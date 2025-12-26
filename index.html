@@ -3,95 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fixed Flex Sender</title>
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <title>Hybrid Flex Sender</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-100 h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-gray-50 min-h-screen font-sans flex items-center justify-center p-4">
 
-    <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center">
-        <h1 class="text-xl font-bold mb-4 text-[#06c755]">Flex Sender (Reset)</h1>
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col min-h-[600px]">
         
-        <div id="status" class="text-sm text-gray-500 mb-4">กำลังตรวจสอบ...</div>
+        <div class="bg-[#06c755] p-4 text-white flex justify-between items-center">
+            <h1 class="font-bold text-lg"><i class="fab fa-line mr-2"></i>Flex Sender <span id="modeBadge" class="text-xs bg-white text-[#06c755] px-2 py-0.5 rounded ml-2">Loading...</span></h1>
+        </div>
 
-        <button onclick="forceReset()" class="text-xs text-red-500 underline mb-4">
-            กดตรงนี้ถ้ายัง Error
-        </button>
+        <div class="p-6 flex-1 flex flex-col gap-4">
 
-        <textarea id="jsonInput" class="w-full border p-2 rounded text-xs h-32 mb-4 hidden" placeholder="JSON Code"></textarea>
-        
-        <button id="btnSend" onclick="sendFlex()" class="hidden w-full bg-[#06c755] text-white py-3 rounded font-bold">
-            ส่งข้อความ
-        </button>
-        
-        <button id="btnLogin" onclick="liff.login()" class="hidden w-full bg-[#00c300] text-white py-3 rounded font-bold">
-            Login with LINE
-        </button>
-    </div>
+            <div id="webSettings" class="hidden bg-orange-50 p-4 rounded-lg border border-orange-200">
+                <h3 class="font-bold text-orange-800 mb-2"><i class="fas fa-laptop"></i> โหมดส่งจากคอมพิวเตอร์</h3>
+                <div class="space-y-2">
+                    <input type="password" id="accessToken" placeholder="Channel Access Token (รหัสบอทยาวๆ)" 
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#06c755]">
+                    <input type="text" id="userId" placeholder="User ID ผู้รับ (Uxxxxxxxx...)" 
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:border-[#06c755]">
+                </div>
+                <p class="text-[10px] text-red-500 mt-2">*หมายเหตุ: ถ้าส่งไม่ไป ให้ติดตั้ง Chrome Extension ชื่อ "Allow CORS" แล้วเปิดใช้งาน</p>
+            </div>
 
-    <script>
-        // ✅ ใส่ ID ของคุณตรงนี้
-        const LIFF_ID = "2008776742-meCAFErj";
-
-        async function main() {
-            try {
-                await liff.init({ liffId: LIFF_ID });
-
-                // ถ้า Login แล้ว
-                if (liff.isLoggedIn()) {
-                    document.getElementById('status').innerText = "พร้อมใช้งาน!";
-                    document.getElementById('jsonInput').classList.remove('hidden');
-                    document.getElementById('btnSend').classList.remove('hidden');
-                    
-                    // โหลดตัวอย่าง
-                    loadSample();
-                } else {
-                    // ถ้ายังไม่ Login
-                    document.getElementById('status').innerText = "กรุณาเข้าสู่ระบบ";
-                    document.getElementById('btnLogin').classList.remove('hidden');
-                }
-            } catch (err) {
-                // 🚨 ถ้าเจอ Error Permission หรือ Token พัง ให้ล้างทิ้งทันที
-                document.getElementById('status').innerText = "พบปัญหา: " + err.code;
-                if (err.code === "FBD33" || err.message.includes("permission") || err.message.includes("revoked")) {
-                    alert("ระบบกำลังล้างค่าเก่าที่ค้างอยู่... กรุณากด OK");
-                    localStorage.clear();
-                    window.location.reload();
-                } else {
-                    alert("Error: " + err.message + "\n\n(ลองกดปุ่ม 'กดตรงนี้ถ้ายัง Error' ด้านล่าง)");
-                }
-            }
-        }
-
-        async function sendFlex() {
-            try {
-                const json = JSON.parse(document.getElementById('jsonInput').value);
-                const msg = (json.type === 'flex') ? json : { type: "flex", altText: "Flex", contents: json };
-
-                if (!liff.isApiAvailable('shareTargetPicker')) {
-                    alert("ต้องเปิดในมือถือเท่านั้น");
-                    return;
-                }
-
-                const res = await liff.shareTargetPicker([msg]);
-                if (res) liff.closeWindow();
-            } catch (e) {
-                alert("JSON ผิด: " + e.message);
-            }
-        }
-
-        function loadSample() {
-            const sample = { type: "bubble", body: { type: "box", layout: "vertical", contents: [{ type: "text", text: "ใช้ได้แล้ว!", size: "xl", weight: "bold", align: "center", color: "#06c755" }] } };
-            document.getElementById('jsonInput').value = JSON.stringify(sample);
-        }
-
-        function forceReset() {
-            localStorage.clear();
-            liff.logout();
-            window.location.reload();
-        }
-
-        main();
-    </script>
-</body>
-</html>
+            <div id="mobileSettings" class="hidden bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h3 class="font-bold text-blue-800 mb-2"><i class="fas fa-mobile-alt"></i> โหมดมือถือ (LIFF)</h3>
+                <div class="flex items-center gap-

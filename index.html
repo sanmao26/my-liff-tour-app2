@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flex Sender (x5 + Alt Text)</title>
+    <title>Flex Sender Pro (Database)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -20,7 +20,7 @@
     <div class="w-full max-w-md bg-white min-h-screen md:min-h-0 md:rounded-xl md:shadow-2xl overflow-hidden flex flex-col">
         
         <div class="bg-[#06c755] p-4 text-white flex justify-between items-center shadow-md z-10">
-            <h1 class="font-bold text-lg"><i class="fab fa-line mr-2"></i>Flex Sender (x5)</h1>
+            <h1 class="font-bold text-lg"><i class="fas fa-database mr-2"></i>Flex Library</h1>
             <div id="userStatus" class="text-xs bg-white/20 px-2 py-1 rounded">Guest</div>
         </div>
 
@@ -36,22 +36,33 @@
 
         <div id="appScreen" class="flex-1 flex flex-col p-4 gap-4 hidden overflow-y-auto max-h-[90vh]">
             
-            <div class="flex items-center gap-3 bg-blue-50 p-3 rounded-lg border border-blue-100">
-                <img id="profileImg" src="" class="w-10 h-10 rounded-full border-2 border-white shadow-sm">
+            <div class="flex items-center gap-3 bg-blue-50 p-2 rounded-lg border border-blue-100">
+                <img id="profileImg" src="" class="w-8 h-8 rounded-full border-2 border-white shadow-sm">
                 <div class="flex-1 min-w-0">
                     <p class="text-[10px] text-gray-500">ผู้ส่ง:</p>
-                    <p id="profileName" class="font-bold text-gray-800 text-sm truncate">...</p>
+                    <p id="profileName" class="font-bold text-gray-800 text-xs truncate">...</p>
                 </div>
                 <button onclick="logout()" class="text-xs text-red-500 underline">ออก</button>
             </div>
 
-            <div class="flex justify-end gap-2 mb-2">
-                <button onclick="loadSample()" class="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-full border border-green-200 font-bold hover:bg-green-200">
-                    ✅ โหลดตัวอย่าง
-                </button>
-                <button onclick="clearAllJson()" class="text-xs bg-gray-200 text-gray-600 px-3 py-1.5 rounded-full hover:bg-gray-300">
-                    🗑️ ล้างทั้งหมด
-                </button>
+            <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-200 shadow-sm">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-xs font-bold text-indigo-800"><i class="fas fa-save"></i> คลังข้อความของฉัน</h3>
+                    <span id="saveCount" class="text-[10px] bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">0 รายการ</span>
+                </div>
+                
+                <div class="flex gap-2 mb-3">
+                    <select id="savedTemplates" class="flex-1 text-xs border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500 bg-white">
+                        <option value="">-- เลือกรายการที่บันทึกไว้ --</option>
+                    </select>
+                    <button onclick="loadTemplate()" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700">โหลด</button>
+                    <button onclick="deleteTemplate()" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded hover:bg-red-600"><i class="fas fa-trash"></i></button>
+                </div>
+
+                <div class="flex gap-2 border-t border-indigo-200 pt-2">
+                    <input type="text" id="saveName" placeholder="ตั้งชื่องาน (เช่น โปรวันแม่)" class="flex-1 text-xs border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500">
+                    <button onclick="saveTemplate()" class="bg-green-600 text-white text-xs px-3 py-1.5 rounded hover:bg-green-700">บันทึกใหม่</button>
+                </div>
             </div>
 
             <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
@@ -63,32 +74,20 @@
             </div>
 
             <div class="space-y-4">
-                
+                <div class="flex justify-end gap-2">
+                    <button onclick="loadSample()" class="text-[10px] text-gray-500 underline">โหลดตัวอย่างโค้ด</button>
+                    <button onclick="clearAllJson()" class="text-[10px] text-red-500 underline">ล้างช่องทั้งหมด</button>
+                </div>
+
                 <div class="relative">
                     <span class="absolute -top-2 left-2 bg-gray-700 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 1</span>
-                    <textarea id="jsonInput1" class="w-full border-2 border-gray-200 rounded-lg p-3 pt-4 text-xs font-mono h-32 focus:border-[#06c755] focus:ring-1 focus:ring-[#06c755]" placeholder='วาง JSON ที่ 1 ที่นี่...'></textarea>
+                    <textarea id="jsonInput1" class="w-full border-2 border-gray-200 rounded-lg p-3 pt-4 text-xs font-mono h-32 focus:border-[#06c755] focus:ring-1 focus:ring-[#06c755]" placeholder='วาง JSON หลักที่นี่...'></textarea>
                 </div>
-
-                <div class="relative">
-                    <span class="absolute -top-2 left-2 bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 2</span>
-                    <textarea id="jsonInput2" class="w-full border border-gray-300 rounded-lg p-3 pt-4 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ) วาง JSON ที่ 2...'></textarea>
-                </div>
-
-                <div class="relative">
-                    <span class="absolute -top-2 left-2 bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 3</span>
-                    <textarea id="jsonInput3" class="w-full border border-gray-300 rounded-lg p-3 pt-4 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ) วาง JSON ที่ 3...'></textarea>
-                </div>
-
-                <div class="relative">
-                    <span class="absolute -top-2 left-2 bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 4</span>
-                    <textarea id="jsonInput4" class="w-full border border-gray-300 rounded-lg p-3 pt-4 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ) วาง JSON ที่ 4...'></textarea>
-                </div>
-
-                <div class="relative">
-                    <span class="absolute -top-2 left-2 bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 5</span>
-                    <textarea id="jsonInput5" class="w-full border border-gray-300 rounded-lg p-3 pt-4 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ) วาง JSON ที่ 5...'></textarea>
-                </div>
-
+                
+                <div class="relative"><span class="absolute -top-2 left-2 bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 2</span><textarea id="jsonInput2" class="w-full border border-gray-300 rounded-lg p-3 pt-4 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
+                <div class="relative"><span class="absolute -top-2 left-2 bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 3</span><textarea id="jsonInput3" class="w-full border border-gray-300 rounded-lg p-3 pt-4 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
+                <div class="relative"><span class="absolute -top-2 left-2 bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 4</span><textarea id="jsonInput4" class="w-full border border-gray-300 rounded-lg p-3 pt-4 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
+                <div class="relative"><span class="absolute -top-2 left-2 bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 5</span><textarea id="jsonInput5" class="w-full border border-gray-300 rounded-lg p-3 pt-4 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
             </div>
 
             <div class="sticky bottom-0 bg-white/90 p-2 backdrop-blur-sm border-t border-gray-100">
@@ -106,10 +105,102 @@
     </div>
 
     <script>
-        // 🚨 LIFF ID เดิมของคุณ
+        // 🚨 LIFF ID
         const MY_LIFF_ID = "2006670623-79XEraMq";
 
+        // --- Database Logic (LocalStorage) ---
+        const DB_KEY = 'my_flex_templates';
+
+        function getDB() {
+            return JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+        }
+
+        function saveToDB(data) {
+            localStorage.setItem(DB_KEY, JSON.stringify(data));
+            updateDropdown();
+        }
+
+        function updateDropdown() {
+            const db = getDB();
+            const select = document.getElementById('savedTemplates');
+            const countSpan = document.getElementById('saveCount');
+            
+            // Clear old options (keep the first one)
+            select.innerHTML = '<option value="">-- เลือกรายการที่บันทึกไว้ --</option>';
+            
+            const keys = Object.keys(db);
+            countSpan.innerText = `${keys.length} รายการ`;
+
+            keys.forEach(key => {
+                const option = document.createElement('option');
+                option.value = key;
+                option.innerText = key;
+                select.appendChild(option);
+            });
+        }
+
+        function saveTemplate() {
+            const name = document.getElementById('saveName').value.trim();
+            if(!name) return alert("กรุณาตั้งชื่องานก่อนบันทึกครับ");
+
+            // เก็บข้อมูลทั้ง 5 ช่อง + Alt Text
+            const dataToSave = {
+                alt: document.getElementById('altTextInput').value,
+                msg1: document.getElementById('jsonInput1').value,
+                msg2: document.getElementById('jsonInput2').value,
+                msg3: document.getElementById('jsonInput3').value,
+                msg4: document.getElementById('jsonInput4').value,
+                msg5: document.getElementById('jsonInput5').value,
+            };
+
+            const db = getDB();
+            if(db[name] && !confirm(`ชื่อ "${name}" มีอยู่แล้ว ต้องการบันทึกทับหรือไม่?`)) return;
+
+            db[name] = dataToSave;
+            saveToDB(db);
+            
+            document.getElementById('saveName').value = ''; // ล้างชื่อหลังบันทึก
+            alert(`✅ บันทึก "${name}" เรียบร้อย!`);
+            // เลือกตัวที่เพิ่งบันทึกให้เลย
+            document.getElementById('savedTemplates').value = name;
+        }
+
+        function loadTemplate() {
+            const name = document.getElementById('savedTemplates').value;
+            if(!name) return alert("กรุณาเลือกรายการที่จะโหลด");
+
+            const db = getDB();
+            const data = db[name];
+
+            if(data) {
+                if(confirm(`ต้องการโหลด "${name}" มาแทนที่ข้อมูลปัจจุบันใช่ไหม?`)) {
+                    document.getElementById('altTextInput').value = data.alt || '';
+                    document.getElementById('jsonInput1').value = data.msg1 || '';
+                    document.getElementById('jsonInput2').value = data.msg2 || '';
+                    document.getElementById('jsonInput3').value = data.msg3 || '';
+                    document.getElementById('jsonInput4').value = data.msg4 || '';
+                    document.getElementById('jsonInput5').value = data.msg5 || '';
+                }
+            }
+        }
+
+        function deleteTemplate() {
+            const name = document.getElementById('savedTemplates').value;
+            if(!name) return alert("กรุณาเลือกรายการที่จะลบ");
+
+            if(confirm(`ยืนยันลบ "${name}" ถาวร?`)) {
+                const db = getDB();
+                delete db[name];
+                saveToDB(db);
+                alert("ลบเรียบร้อย");
+            }
+        }
+
+        // --- Main App Logic ---
+
         window.onload = async function() {
+            updateDropdown(); // โหลดข้อมูลเก่ามาใส่ List ทันทีที่เปิดเว็บ
+            
             try {
                 await liff.init({ liffId: MY_LIFF_ID });
                 if (liff.isLoggedIn()) displayApp();
@@ -144,16 +235,14 @@
         }
 
         function clearAllJson() {
-            for(let i=1; i<=5; i++) {
-                document.getElementById('jsonInput'+i).value = '';
+            if(confirm("ล้างข้อความในช่องทั้งหมด?")) {
+                for(let i=1; i<=5; i++) document.getElementById('jsonInput'+i).value = '';
+                document.getElementById('altTextInput').value = '';
             }
-            document.getElementById('altTextInput').value = '';
         }
 
         async function sendFlex() {
             let messagesToSend = [];
-            
-            // ดึงค่า Alt Text จากช่อง (ถ้ามี)
             const globalAltText = document.getElementById('altTextInput').value.trim();
 
             for(let i=1; i<=5; i++) {
@@ -161,23 +250,15 @@
                 if(raw) {
                     try {
                         let parsed = JSON.parse(raw);
-                        
-                        // กรณี 1: เป็น Bubble/Carousel (ไม่มี wrapper) -> เราเติมให้
                         if (parsed.type === "bubble" || parsed.type === "carousel") {
                             parsed = {
                                 type: "flex",
-                                altText: globalAltText || "Flex Message", // ใช้ Alt Text ที่กรอก หรือค่า default
+                                altText: globalAltText || "Flex Message",
                                 contents: parsed
                             };
-                        } 
-                        // กรณี 2: เป็น Flex อยู่แล้ว (มี wrapper)
-                        else if (parsed.type === "flex") {
-                            // ถ้ามีการกรอก Alt Text ใหม่ ให้ทับของเดิม
-                            if (globalAltText) {
-                                parsed.altText = globalAltText;
-                            }
+                        } else if (parsed.type === "flex" && globalAltText) {
+                            parsed.altText = globalAltText;
                         }
-
                         messagesToSend.push(parsed);
                     } catch(e) {
                         alert(`❌ ช่องที่ ${i} โค้ด JSON ผิดพลาด:\n${e.message}`);
@@ -186,15 +267,10 @@
                 }
             }
 
-            if (messagesToSend.length === 0) {
-                return alert("กรุณาใส่อย่างน้อย 1 ช่องครับ");
-            }
+            if (messagesToSend.length === 0) return alert("กรุณาใส่อย่างน้อย 1 ช่องครับ");
 
             try {
-                if (!liff.isApiAvailable('shareTargetPicker')) {
-                    alert("ฟีเจอร์นี้ต้องใช้บนแอป LINE ในมือถือเท่านั้น");
-                    return;
-                }
+                if (!liff.isApiAvailable('shareTargetPicker')) return alert("ฟีเจอร์นี้ต้องใช้บนแอป LINE ในมือถือเท่านั้น");
                 const res = await liff.shareTargetPicker(messagesToSend);
                 if (res) liff.closeWindow();
             } catch (error) {
@@ -203,19 +279,9 @@
         }
 
         function loadSample() {
-            const sample = { 
-                type: "bubble", 
-                body: { 
-                    type: "box", 
-                    layout: "vertical", 
-                    contents: [
-                        { type: "text", text: "ใช้ได้แล้ว!", size: "xl", weight: "bold", align: "center", color: "#06c755" }
-                    ] 
-                } 
-            };
+            const sample = { type: "bubble", body: { type: "box", layout: "vertical", contents: [{ type: "text", text: "ตัวอย่างจ้า!", size: "xl", weight: "bold", align: "center", color: "#06c755" }] } };
             document.getElementById('jsonInput1').value = JSON.stringify(sample, null, 2);
-            document.getElementById('altTextInput').value = "แจ้งเตือน: ใช้ได้แล้วจ้า!";
-            alert("โหลดตัวอย่างลงช่องที่ 1 เรียบร้อย");
+            document.getElementById('altTextInput').value = "แจ้งเตือนตัวอย่าง";
         }
     </script>
 </body>

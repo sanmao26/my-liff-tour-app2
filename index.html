@@ -148,33 +148,21 @@
 
         function loadJapanTour() {
             const sample = {
-                "type": "flex",
-                "altText": "🔥รวมโปรญี่ปุ่น สุดคุ้ม!",
-                "contents": {
-                    "type": "bubble",
-                    "hero": {
-                        "type": "image",
-                        "url": "https://i.postimg.cc/9QK80cTC/49842843731-41506214783-1747639625-988650243-f.jpg",
-                        "size": "full",
-                        "aspectRatio": "20:13",
-                        "aspectMode": "cover",
-                        "action": { "type": "uri", "uri": "https://line.me/" }
-                    },
-                    "body": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                            { "type": "text", "text": "ทัวร์ญี่ปุ่น 5 วัน 3 คืน", "weight": "bold", "size": "xl" },
-                            { "type": "text", "text": "เริ่ม 17,999 บาท", "color": "#ff5555", "size": "sm" }
-                        ]
-                    },
-                    "footer": {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                            { "type": "button", "style": "primary", "color": "#06c755", "action": { "type": "uri", "label": "จองเลย", "uri": "https://line.me/" } }
-                        ]
-                    }
+                "type": "bubble",
+                "hero": {
+                    "type": "image", "url": "https://i.postimg.cc/9QK80cTC/49842843731-41506214783-1747639625-988650243-f.jpg",
+                    "size": "full", "aspectRatio": "20:13", "aspectMode": "cover"
+                },
+                "body": {
+                    "type": "box", "layout": "vertical",
+                    "contents": [
+                        { "type": "text", "text": "ทัวร์ญี่ปุ่น 5 วัน 3 คืน", "weight": "bold", "size": "xl" },
+                        { "type": "text", "text": "ราคาพิเศษ 17,999.-", "color": "#ff5555" }
+                    ]
+                },
+                "footer": {
+                    "type": "box", "layout": "vertical",
+                    "contents": [{ "type": "button", "style": "primary", "action": { "type": "uri", "label": "จองเลย", "uri": "https://line.me" } }]
                 }
             };
             document.getElementById('jsonInput').value = JSON.stringify(sample, null, 2);

@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flex Sender (Max 5)</title>
+    <title>Flex Sender (x5 + Alt Text)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .hidden { display: none !important; }
-        /* แต่ง Scrollbar ให้สวยหน่อย */
         textarea::-webkit-scrollbar { width: 8px; }
         textarea::-webkit-scrollbar-track { background: #f1f1f1; }
         textarea::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -53,6 +52,14 @@
                 <button onclick="clearAllJson()" class="text-xs bg-gray-200 text-gray-600 px-3 py-1.5 rounded-full hover:bg-gray-300">
                     🗑️ ล้างทั้งหมด
                 </button>
+            </div>
+
+            <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                <label class="text-xs font-bold text-yellow-800 block mb-1">
+                    <i class="fas fa-comment-dots"></i> ข้อความแจ้งเตือน (Alt Text)
+                </label>
+                <input type="text" id="altTextInput" placeholder="Ex. โปรโมชั่นใหม่มาแล้ว! (ถ้าไม่ใส่จะใช้ค่าเดิม)" 
+                    class="w-full border border-yellow-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-yellow-500 bg-white">
             </div>
 
             <div class="space-y-4">
@@ -140,25 +147,41 @@
             for(let i=1; i<=5; i++) {
                 document.getElementById('jsonInput'+i).value = '';
             }
+            document.getElementById('altTextInput').value = '';
         }
 
         async function sendFlex() {
             let messagesToSend = [];
+            
+            // ดึงค่า Alt Text จากช่อง (ถ้ามี)
+            const globalAltText = document.getElementById('altTextInput').value.trim();
 
-            // วนลูปเช็คทั้ง 5 ช่อง
             for(let i=1; i<=5; i++) {
                 const raw = document.getElementById('jsonInput'+i).value.trim();
                 if(raw) {
                     try {
                         let parsed = JSON.parse(raw);
-                        // ถ้า user ลืมใส่ wrapper flex เราใส่ให้
+                        
+                        // กรณี 1: เป็น Bubble/Carousel (ไม่มี wrapper) -> เราเติมให้
                         if (parsed.type === "bubble" || parsed.type === "carousel") {
-                            parsed = { type: "flex", altText: "Flex Message " + i, contents: parsed };
+                            parsed = {
+                                type: "flex",
+                                altText: globalAltText || "Flex Message", // ใช้ Alt Text ที่กรอก หรือค่า default
+                                contents: parsed
+                            };
+                        } 
+                        // กรณี 2: เป็น Flex อยู่แล้ว (มี wrapper)
+                        else if (parsed.type === "flex") {
+                            // ถ้ามีการกรอก Alt Text ใหม่ ให้ทับของเดิม
+                            if (globalAltText) {
+                                parsed.altText = globalAltText;
+                            }
                         }
+
                         messagesToSend.push(parsed);
                     } catch(e) {
                         alert(`❌ ช่องที่ ${i} โค้ด JSON ผิดพลาด:\n${e.message}`);
-                        return; // หยุดทำงานทันทีถ้าเจอช่องไหนผิด
+                        return;
                     }
                 }
             }
@@ -167,7 +190,6 @@
                 return alert("กรุณาใส่อย่างน้อย 1 ช่องครับ");
             }
 
-            // ส่งข้อมูล
             try {
                 if (!liff.isApiAvailable('shareTargetPicker')) {
                     alert("ฟีเจอร์นี้ต้องใช้บนแอป LINE ในมือถือเท่านั้น");
@@ -191,9 +213,9 @@
                     ] 
                 } 
             };
-            // ใส่แค่ช่องที่ 1 ช่องเดียว
             document.getElementById('jsonInput1').value = JSON.stringify(sample, null, 2);
-            alert("โหลดตัวอย่างลงช่องที่ 1 แล้วครับ");
+            document.getElementById('altTextInput').value = "แจ้งเตือน: ใช้ได้แล้วจ้า!";
+            alert("โหลดตัวอย่างลงช่องที่ 1 เรียบร้อย");
         }
     </script>
 </body>

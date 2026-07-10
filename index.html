@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flex Sender Pro (Live Preview)</title>
+    <title>Flex Sender Pro (Multi-Preview)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -14,7 +14,6 @@
         textarea::-webkit-scrollbar-thumb, .custom-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
         textarea::-webkit-scrollbar-thumb:hover, .custom-scroll::-webkit-scrollbar-thumb:hover { background: #bbb; }
         
-        /* นำ width ออกให้ปรับเปลี่ยนแบบไดนามิกได้ */
         .flex-preview-box { border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     </style>
 </head>
@@ -22,7 +21,6 @@
 
     <div class="w-full max-w-5xl flex flex-col md:flex-row gap-6 items-start justify-center">
 
-        <!-- 🌟 ฝั่งซ้าย: หน้าจอ Preview จำลอง -->
         <div id="previewSide" class="hidden w-full md:w-[360px] bg-white rounded-[2rem] shadow-2xl flex-col overflow-hidden sticky top-8 border-[6px] border-gray-800 h-[680px] shrink-0">
             <div class="bg-gray-800 text-white flex justify-between items-center px-4 py-2">
                 <span class="text-xs font-bold">12:00</span>
@@ -35,15 +33,14 @@
                 <span class="font-bold text-sm">LINE Preview</span>
             </div>
             
-            <!-- เปลี่ยน padding เพื่อให้รองรับ giga size ได้เต็มๆ -->
             <div class="bg-[#749bb6] flex-1 px-3 py-4 flex flex-col items-center overflow-y-auto custom-scroll relative">
                 <div class="text-center text-white/40 text-[10px] mb-4 bg-black/10 px-3 py-1 rounded-full">วันนี้</div>
                 
-                <div id="previewContent" class="w-full flex justify-start pb-8 overflow-x-visible">
+                <div id="previewContent" class="w-full flex flex-col gap-4 pb-8 overflow-x-visible">
                     <div class="w-full text-center text-white/60 text-xs mt-20 flex flex-col items-center gap-2">
-                        <i class="fas fa-eye text-3xl mb-2"></i>
-                        <p>กดปุ่ม "ดูตัวอย่าง" ที่กล่องข้อความ</p>
-                        <p>เพื่อพรีวิวรูปร่างที่นี่ครับ</p>
+                        <i class="fas fa-layer-group text-3xl mb-2"></i>
+                        <p>พรีวิวสามารถแสดงผลได้สูงสุด 5 ข้อความ</p>
+                        <p>ลองกดปุ่ม "พรีวิวทั้งหมด" ดูสิครับ</p>
                     </div>
                 </div>
             </div>
@@ -56,7 +53,6 @@
             </div>
         </div>
 
-        <!-- 🌟 ฝั่งขวา: เครื่องมือหลัก -->
         <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col">
             
             <div class="bg-[#06c755] p-4 text-white flex justify-between items-center shadow-md z-10">
@@ -64,7 +60,6 @@
                 <div id="userStatus" class="text-xs bg-white/20 px-2 py-1 rounded">Guest</div>
             </div>
 
-            <!-- Login Screen -->
             <div id="loginScreen" class="flex flex-col items-center justify-center p-12 text-center h-[500px]">
                 <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                     <i class="fas fa-user-lock text-4xl text-gray-400"></i>
@@ -75,337 +70,6 @@
                 </button>
             </div>
 
-            <!-- App Screen -->
             <div id="appScreen" class="flex-col p-4 gap-4 hidden overflow-y-auto max-h-[85vh] custom-scroll">
                 
-                <div class="flex items-center gap-3 bg-blue-50 p-2 rounded-lg border border-blue-100 mb-4">
-                    <img id="profileImg" src="" class="w-8 h-8 rounded-full border-2 border-white shadow-sm">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-[10px] text-gray-500">ผู้ส่ง:</p>
-                        <p id="profileName" class="font-bold text-gray-800 text-xs truncate">...</p>
-                    </div>
-                    <button onclick="logout()" class="text-xs text-red-500 underline">ออก</button>
-                </div>
-
-                <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-200 shadow-sm mb-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-xs font-bold text-indigo-800"><i class="fas fa-save"></i> คลังข้อความของฉัน</h3>
-                        <span id="saveCount" class="text-[10px] bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">0 รายการ</span>
-                    </div>
-                    <div class="flex gap-2 mb-3">
-                        <select id="savedTemplates" class="flex-1 text-xs border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500 bg-white">
-                            <option value="">-- เลือกรายการที่บันทึกไว้ --</option>
-                        </select>
-                        <button onclick="loadTemplate()" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700">โหลด</button>
-                        <button onclick="deleteTemplate()" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded hover:bg-red-600"><i class="fas fa-trash"></i></button>
-                    </div>
-                    <div class="flex gap-2 border-t border-indigo-200 pt-2">
-                        <input type="text" id="saveName" placeholder="ตั้งชื่องาน (เช่น โปรวันแม่)" class="flex-1 text-xs border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500">
-                        <button onclick="saveTemplate()" class="bg-green-600 text-white text-xs px-3 py-1.5 rounded hover:bg-green-700">บันทึกใหม่</button>
-                    </div>
-                </div>
-
-                <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 mb-4">
-                    <label class="text-xs font-bold text-yellow-800 block mb-1">
-                        <i class="fas fa-comment-dots"></i> ข้อความแจ้งเตือน (Alt Text)
-                    </label>
-                    <input type="text" id="altTextInput" placeholder="Ex. โปรโมชั่นใหม่มาแล้ว!" class="w-full border border-yellow-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-yellow-500 bg-white">
-                </div>
-
-                <div class="space-y-4 pb-4">
-                    <div class="flex justify-end gap-2">
-                        <button onclick="loadSample()" class="text-[10px] text-gray-500 underline">โหลดตัวอย่างโค้ด</button>
-                        <button onclick="clearAllJson()" class="text-[10px] text-red-500 underline">ล้างช่องทั้งหมด</button>
-                    </div>
-
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="bg-gray-700 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 1 (หลัก)</span>
-                            <button onclick="previewFlex(1)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded border border-blue-200"><i class="fas fa-eye"></i> ดูตัวอย่าง</button>
-                        </div>
-                        <textarea id="jsonInput1" class="w-full border-2 border-gray-200 rounded-lg p-3 text-xs font-mono h-32 focus:border-[#06c755] focus:ring-1 focus:ring-[#06c755]" placeholder='วาง JSON หลักที่นี่...'></textarea>
-                    </div>
-
-                    <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 2</span><button onclick="previewFlex(2)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded border border-blue-200"><i class="fas fa-eye"></i> ดูตัวอย่าง</button></div><textarea id="jsonInput2" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
-                    <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 3</span><button onclick="previewFlex(3)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded border border-blue-200"><i class="fas fa-eye"></i> ดูตัวอย่าง</button></div><textarea id="jsonInput3" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
-                    <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 4</span><button onclick="previewFlex(4)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded border border-blue-200"><i class="fas fa-eye"></i> ดูตัวอย่าง</button></div><textarea id="jsonInput4" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
-                    <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 5</span><button onclick="previewFlex(5)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded border border-blue-200"><i class="fas fa-eye"></i> ดูตัวอย่าง</button></div><textarea id="jsonInput5" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
-                </div>
-
-                <div class="sticky bottom-0 bg-white/90 p-2 backdrop-blur-sm border-t border-gray-100">
-                    <button onclick="sendFlex()" class="w-full bg-[#06c755] hover:bg-[#05b34c] text-white font-bold py-3 rounded-lg shadow-lg text-lg flex justify-center items-center gap-2 transition-all active:scale-95">
-                        <i class="fas fa-paper-plane"></i> ส่งทั้งหมด
-                    </button>
-                </div>
-            </div>
-
-            <div id="loadingScreen" class="flex flex-col items-center justify-center p-12 h-[500px]">
-                <i class="fas fa-circle-notch fa-spin text-4xl text-[#06c755] mb-4"></i>
-                <p class="text-gray-400 text-sm">กำลังโหลด...</p>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // 🚨 LIFF ID
-        const MY_LIFF_ID = "2006670623-79XEraMq";
-
-        const DB_KEY = 'my_flex_templates';
-        function getDB() { return JSON.parse(localStorage.getItem(DB_KEY) || '{}'); }
-        function saveToDB(data) { localStorage.setItem(DB_KEY, JSON.stringify(data)); updateDropdown(); }
-
-        function updateDropdown() {
-            const db = getDB();
-            const select = document.getElementById('savedTemplates');
-            const countSpan = document.getElementById('saveCount');
-            select.innerHTML = '<option value="">-- เลือกรายการที่บันทึกไว้ --</option>';
-            const keys = Object.keys(db);
-            countSpan.innerText = `${keys.length} รายการ`;
-            keys.forEach(key => {
-                const option = document.createElement('option');
-                option.value = key; option.innerText = key;
-                select.appendChild(option);
-            });
-        }
-
-        function saveTemplate() {
-            const name = document.getElementById('saveName').value.trim();
-            if(!name) return alert("กรุณาตั้งชื่องานก่อนบันทึกครับ");
-            const dataToSave = {
-                alt: document.getElementById('altTextInput').value,
-                msg1: document.getElementById('jsonInput1').value,
-                msg2: document.getElementById('jsonInput2').value,
-                msg3: document.getElementById('jsonInput3').value,
-                msg4: document.getElementById('jsonInput4').value,
-                msg5: document.getElementById('jsonInput5').value,
-            };
-            const db = getDB();
-            if(db[name] && !confirm(`ชื่อ "${name}" มีอยู่แล้ว บันทึกทับหรือไม่?`)) return;
-            db[name] = dataToSave; saveToDB(db);
-            document.getElementById('saveName').value = '';
-            alert(`✅ บันทึก "${name}" เรียบร้อย!`);
-            document.getElementById('savedTemplates').value = name;
-        }
-
-        function loadTemplate() {
-            const name = document.getElementById('savedTemplates').value;
-            if(!name) return alert("กรุณาเลือกรายการที่จะโหลด");
-            const data = getDB()[name];
-            if(data && confirm(`โหลด "${name}" มาแทนที่ข้อมูลปัจจุบัน?`)) {
-                document.getElementById('altTextInput').value = data.alt || '';
-                for(let i=1; i<=5; i++) document.getElementById('jsonInput'+i).value = data['msg'+i] || '';
-            }
-        }
-
-        function deleteTemplate() {
-            const name = document.getElementById('savedTemplates').value;
-            if(!name) return alert("กรุณาเลือกรายการที่จะลบ");
-            if(confirm(`ยืนยันลบ "${name}" ถาวร?`)) {
-                const db = getDB(); delete db[name]; saveToDB(db);
-                alert("ลบเรียบร้อย");
-            }
-        }
-
-        window.onload = async function() {
-            updateDropdown();
-            try {
-                await liff.init({ liffId: MY_LIFF_ID });
-                if (liff.isLoggedIn()) displayApp();
-                else displayLogin();
-            } catch (err) { alert("Error: " + err.message); displayLogin(); }
-        };
-
-        async function displayApp() {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appScreen').classList.remove('hidden');
-            document.getElementById('appScreen').classList.add('flex');
-            document.getElementById('previewSide').classList.remove('hidden');
-            document.getElementById('previewSide').classList.add('flex');
-
-            try {
-                const profile = await liff.getProfile();
-                document.getElementById('profileName').innerText = profile.displayName;
-                document.getElementById('profileImg').src = profile.pictureUrl;
-                document.getElementById('userStatus').innerText = "Active";
-            } catch (e) { console.error(e); }
-        }
-
-        function displayLogin() {
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('appScreen').classList.add('hidden');
-            document.getElementById('appScreen').classList.remove('flex');
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('previewSide').classList.add('hidden');
-            document.getElementById('previewSide').classList.remove('flex');
-        }
-
-        function logout() { liff.logout(); window.location.reload(); }
-
-        function clearAllJson() {
-            if(confirm("ล้างข้อความในช่องทั้งหมด?")) {
-                for(let i=1; i<=5; i++) document.getElementById('jsonInput'+i).value = '';
-                document.getElementById('altTextInput').value = '';
-            }
-        }
-
-        async function sendFlex() {
-            let messagesToSend = [];
-            const globalAltText = document.getElementById('altTextInput').value.trim();
-
-            for(let i=1; i<=5; i++) {
-                const raw = document.getElementById('jsonInput'+i).value.trim();
-                if(raw) {
-                    try {
-                        let parsed = JSON.parse(raw);
-                        if (parsed.type === "bubble" || parsed.type === "carousel") {
-                            parsed = { type: "flex", altText: globalAltText || "Flex Message", contents: parsed };
-                        } else if (parsed.type === "flex" && globalAltText) {
-                            parsed.altText = globalAltText;
-                        }
-                        messagesToSend.push(parsed);
-                    } catch(e) { return alert(`❌ ช่องที่ ${i} โค้ด JSON ผิดพลาด:\n${e.message}`); }
-                }
-            }
-            if (messagesToSend.length === 0) return alert("กรุณาใส่อย่างน้อย 1 ช่องครับ");
-
-            try {
-                if (!liff.isApiAvailable('shareTargetPicker')) return alert("ใช้บนแอป LINE ในมือถือเท่านั้น");
-                const res = await liff.shareTargetPicker(messagesToSend);
-                if (res) liff.closeWindow();
-            } catch (error) { alert("ส่งไม่สำเร็จ: " + error.message); }
-        }
-
-        function loadSample() {
-            const sample = { 
-                type: "bubble", size: "giga",
-                hero: { type: "image", url: "https://i.postimg.cc/9QK80cTC/49842843731-41506214783-1747639625-988650243-f.jpg", size: "full", aspectRatio: "20:13", aspectMode: "cover" },
-                body: { type: "box", layout: "vertical", contents: [
-                    { type: "text", text: "โปรโมชั่นพิเศษ!", weight: "bold", size: "xl", color: "#ff0000" }
-                ]}
-            };
-            document.getElementById('jsonInput1').value = JSON.stringify(sample, null, 2);
-            document.getElementById('altTextInput').value = "🔥 โปรโมชั่นพิเศษมาแล้ว!";
-            previewFlex(1); 
-        }
-
-        // 🌟 --- ระบบ Render ซ้ายมือ (อัปเกรดฉลาดขึ้นสุดๆ!) --- 🌟
-        function previewFlex(index) {
-            const raw = document.getElementById('jsonInput' + index).value.trim();
-            if (!raw) return alert("กรุณาวางโค้ด JSON ก่อนกดพรีวิวครับ");
-
-            try {
-                let flex = JSON.parse(raw);
-                
-                // 1. ถ้ามาเป็น Flex Wrapper (มี contents)
-                if (flex.type === "flex" && flex.contents) flex = flex.contents;
-                
-                // 2. ถ้ามาเป็น Array ดิบๆ ถือว่าเป็น Carousel ทันที
-                if (Array.isArray(flex)) flex = { type: 'carousel', contents: flex };
-                
-                // 3. ถ้ามาเป็น Object ที่มี contents แต่ไม่ได้บอก type ก็ถือว่าเป็น Carousel
-                if (!flex.type && Array.isArray(flex.contents)) flex = { type: 'carousel', contents: flex.contents };
-
-                // 4. ถ้าหลุดมาทั้งหมด ให้เดาว่าเป็น bubble
-                if (!flex.type) flex.type = 'bubble';
-
-                const html = renderFlexToHTML(flex);
-                
-                document.getElementById('previewContent').innerHTML = html;
-
-                if(window.innerWidth < 768) {
-                    document.getElementById('previewSide').scrollIntoView({ behavior: 'smooth' });
-                }
-            } catch (e) {
-                alert("❌ JSON ผิดรูปแบบ (เช็คลูกน้ำ วงเล็บ หรือเครื่องหมายคำพูดให้ดีครับ)\n\n" + e.message);
-            }
-        }
-
-        function renderFlexToHTML(flex) {
-            if (!flex) return '';
-            
-            if (flex.type === 'carousel') {
-                return `<div class="flex overflow-x-auto gap-2 pb-2 w-full snap-x">${(flex.contents || []).map(b => renderFlexToHTML(b)).join('')}</div>`;
-            }
-            
-            if (flex.type === 'bubble') {
-                // 🔥 คำนวณความกว้างที่แท้จริง
-                let size = flex.size || 'mega'; // ค่าเริ่มต้น LINE คือ mega
-                let width = "280px"; 
-                if(size === 'nano') width = "130px";
-                else if(size === 'micro') width = "160px";
-                else if(size === 'deca') width = "190px";
-                else if(size === 'hecto') width = "220px";
-                else if(size === 'kilo') width = "250px";
-                else if(size === 'mega') width = "280px";
-                else if(size === 'giga') width = "315px"; // กว้างสุดเต็มจอจำลอง
-
-                let html = `<div class="flex-preview-box flex flex-col flex-shrink-0 snap-center" style="width: ${width}; max-width: 100%;">`;
-                if (flex.header) html += renderBox(flex.header);
-                if (flex.hero) html += renderComponent(flex.hero);
-                if (flex.body) html += renderBox(flex.body);
-                if (flex.footer) html += renderBox(flex.footer);
-                html += `</div>`;
-                return html;
-            }
-            return `<div class="bg-white p-4 rounded text-sm text-red-500">รองรับพรีวิวเฉพาะ Bubble และ Carousel</div>`;
-        }
-
-        function renderBox(box) {
-            if (!box || box.type !== 'box') return '';
-            let isRow = box.layout === 'horizontal' || box.layout === 'baseline';
-            let layoutCls = isRow ? 'flex flex-row items-center' : 'flex flex-col';
-            let bg = box.backgroundColor ? `background-color: ${box.backgroundColor};` : '';
-            
-            // padding พื้นฐานของ LINE Box จะประมาณ 16px (p-4 ใน tailwind) แต่เพื่อความสวยใส่ p-3 ไว้
-            let p = 'p-3'; 
-            if(box.paddingAll === '0px' || box.paddingAll === 'none') p = 'p-0';
-            
-            let html = `<div class="${layoutCls} ${p} gap-2" style="${bg}">`;
-            if (box.contents) {
-                box.contents.forEach(c => { html += renderComponent(c); });
-            }
-            html += `</div>`;
-            return html;
-        }
-
-        function renderComponent(c) {
-            if (!c) return '';
-            if (c.type === 'text') {
-                let weight = c.weight === 'bold' ? 'font-bold' : 'font-normal';
-                let color = c.color || '#111111';
-                let align = c.align === 'center' ? 'text-center' : c.align === 'end' ? 'text-right' : 'text-left';
-                
-                let sizeClass = 'text-sm';
-                if(c.size === 'xxs') sizeClass = 'text-[10px]';
-                else if(c.size === 'xs') sizeClass = 'text-xs';
-                else if(c.size === 'sm') sizeClass = 'text-[13px]';
-                else if(c.size === 'md') sizeClass = 'text-sm';
-                else if(c.size === 'lg') sizeClass = 'text-base';
-                else if(c.size === 'xl') sizeClass = 'text-lg';
-                else if(c.size === 'xxl' || c.size === '3xl') sizeClass = 'text-xl';
-                else if(c.size === '4xl' || c.size === '5xl') sizeClass = 'text-2xl';
-
-                let wrap = c.wrap ? 'whitespace-normal' : 'truncate';
-                return `<div class="${weight} ${align} ${sizeClass} ${wrap} flex-1" style="color: ${color}">${c.text||''}</div>`;
-            }
-            if (c.type === 'image') {
-                // 🔥 คำนวณ Aspect Ratio อัตโนมัติ ป้องกันรูปแบน
-                let aspect = c.aspectRatio || '1:1';
-                aspect = aspect.replace(':', '/'); // แปลง 20:13 เป็น 20/13 สำหรับ CSS
-                let objectFit = c.aspectMode === 'cover' ? 'object-cover' : 'object-contain';
-                let bg = c.backgroundColor ? `background-color: ${c.backgroundColor};` : '';
-                return `<img src="${c.url}" class="w-full block ${objectFit}" style="aspect-ratio: ${aspect}; ${bg}" alt="image">`;
-            }
-            if (c.type === 'button') {
-                let bg = c.style === 'primary' ? (c.color || '#06c755') : (c.style === 'secondary' ? '#f1f1f1' : 'transparent');
-                let textCol = c.style === 'primary' ? '#ffffff' : (c.color || '#06c755');
-                return `<div class="text-center p-2 rounded cursor-pointer mt-1 text-sm font-bold w-full" style="background-color: ${bg}; color: ${textCol}; border: 1px solid ${c.style==='link' ? 'transparent' : (c.color || '#06c755')}">${c.action?.label||'Button'}</div>`;
-            }
-            if (c.type === 'separator') return `<div class="w-full border-t border-gray-200 my-1" style="border-color: ${c.color || '#eeeeee'}"></div>`;
-            if (c.type === 'box') return renderBox(c);
-            return '';
-        }
-    </script>
-</body>
-</html>
+                <div class="flex items-center gap-3 bg-blue-5

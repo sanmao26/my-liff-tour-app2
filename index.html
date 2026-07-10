@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flex Sender Pro (Text & Flex Preview)</title>
+    <title>Flex Sender Pro (Fix Carousel)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         .hidden { display: none !important; }
-        textarea::-webkit-scrollbar, .custom-scroll::-webkit-scrollbar { width: 6px; }
-        textarea::-webkit-scrollbar-track, .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; }
-        textarea::-webkit-scrollbar-thumb, .custom-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-        textarea::-webkit-scrollbar-thumb:hover, .custom-scroll::-webkit-scrollbar-thumb:hover { background: #bbb; }
+        /* ปรับแต่ง Scrollbar ของพรีวิวและ Carousel ให้สวยงาม */
+        textarea::-webkit-scrollbar, .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        textarea::-webkit-scrollbar-track, .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        textarea::-webkit-scrollbar-thumb, .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb:hover, .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
         .flex-preview-box { border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     </style>
@@ -37,7 +38,7 @@
             <div class="bg-[#749bb6] flex-1 px-3 py-4 flex flex-col items-center overflow-y-auto custom-scroll relative">
                 <div class="text-center text-white/40 text-[10px] mb-4 bg-black/10 px-3 py-1 rounded-full">วันนี้</div>
                 
-                <div id="previewContent" class="w-full flex flex-col gap-4 pb-8 overflow-x-visible">
+                <div id="previewContent" class="w-full flex flex-col gap-4 pb-8 overflow-x-hidden">
                     <div class="w-full text-center text-white/60 text-xs mt-20 flex flex-col items-center gap-2">
                         <i class="fas fa-layer-group text-3xl mb-2"></i>
                         <p>พรีวิวสามารถแสดงผลได้สูงสุด 5 ข้อความ</p>
@@ -85,7 +86,6 @@
                     <button onclick="logout()" class="text-xs text-red-500 underline">ออก</button>
                 </div>
 
-                <!-- Database Section -->
                 <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-200 shadow-sm mb-4">
                     <div class="flex justify-between items-center mb-2">
                         <h3 class="text-xs font-bold text-indigo-800"><i class="fas fa-save"></i> คลังข้อความของฉัน</h3>
@@ -104,7 +104,6 @@
                     </div>
                 </div>
 
-                <!-- Alt Text -->
                 <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 mb-4">
                     <label class="text-xs font-bold text-yellow-800 block mb-1">
                         <i class="fas fa-comment-dots"></i> ข้อความแจ้งเตือน (Alt Text)
@@ -112,10 +111,7 @@
                     <input type="text" id="altTextInput" placeholder="Ex. โปรโมชั่นใหม่มาแล้ว!" class="w-full border border-yellow-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-yellow-500 bg-white">
                 </div>
 
-                <!-- 5 Input Boxes -->
                 <div class="space-y-4 pb-4">
-                    
-                    <!-- แผงควบคุมรวม เพิ่มปุ่ม พรีวิวทั้งหมด -->
                     <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-gray-200">
                         <button onclick="previewAll()" class="text-xs text-white font-bold bg-blue-500 hover:bg-blue-600 px-4 py-1.5 rounded-full shadow-sm">
                             <i class="fas fa-eye"></i> พรีวิวทั้งหมด 5 ช่อง
@@ -126,14 +122,7 @@
                         </div>
                     </div>
 
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="bg-gray-700 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 1 (หลัก)</span>
-                            <button onclick="previewFlex(1)" class="text-[10px] text-blue-600 hover:text-blue-800 bg-blue-100 px-2 py-0.5 rounded"><i class="fas fa-search"></i> พรีวิวเดี่ยว</button>
-                        </div>
-                        <textarea id="jsonInput1" class="w-full border-2 border-gray-200 rounded-lg p-3 text-xs font-mono h-32 focus:border-[#06c755] focus:ring-1 focus:ring-[#06c755]" placeholder='วาง JSON หลักที่นี่...'></textarea>
-                    </div>
-
+                    <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-700 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 1 (หลัก)</span><button onclick="previewFlex(1)" class="text-[10px] text-blue-600 hover:text-blue-800 bg-blue-100 px-2 py-0.5 rounded"><i class="fas fa-search"></i> พรีวิวเดี่ยว</button></div><textarea id="jsonInput1" class="w-full border-2 border-gray-200 rounded-lg p-3 text-xs font-mono h-32 focus:border-[#06c755] focus:ring-1 focus:ring-[#06c755]" placeholder='วาง JSON หลักที่นี่...'></textarea></div>
                     <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 2</span><button onclick="previewFlex(2)" class="text-[10px] text-blue-600 hover:text-blue-800 bg-blue-100 px-2 py-0.5 rounded"><i class="fas fa-search"></i> พรีวิวเดี่ยว</button></div><textarea id="jsonInput2" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
                     <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 3</span><button onclick="previewFlex(3)" class="text-[10px] text-blue-600 hover:text-blue-800 bg-blue-100 px-2 py-0.5 rounded"><i class="fas fa-search"></i> พรีวิวเดี่ยว</button></div><textarea id="jsonInput3" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
                     <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 4</span><button onclick="previewFlex(4)" class="text-[10px] text-blue-600 hover:text-blue-800 bg-blue-100 px-2 py-0.5 rounded"><i class="fas fa-search"></i> พรีวิวเดี่ยว</button></div><textarea id="jsonInput4" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
@@ -287,24 +276,22 @@
         }
 
         function loadSample() {
-            const sample1 = { 
-                type: "bubble", size: "giga",
-                hero: { type: "image", url: "https://i.postimg.cc/9QK80cTC/49842843731-41506214783-1747639625-988650243-f.jpg", size: "full", aspectRatio: "20:13", aspectMode: "cover" },
-                body: { type: "box", layout: "vertical", contents: [
-                    { type: "text", text: "โปรโมชั่นพิเศษ 1!", weight: "bold", size: "xl", color: "#ff0000" }
-                ]}
+            const sample1 = {
+                type: "carousel",
+                contents: [
+                    { type: "bubble", size: "micro", body: { type: "box", layout: "vertical", contents: [{ type: "text", text: "แพ็กเกจ 1", weight: "bold", align: "center" }] } },
+                    { type: "bubble", size: "micro", body: { type: "box", layout: "vertical", contents: [{ type: "text", text: "แพ็กเกจ 2", weight: "bold", align: "center" }] } },
+                    { type: "bubble", size: "micro", body: { type: "box", layout: "vertical", contents: [{ type: "text", text: "แพ็กเกจ 3", weight: "bold", align: "center" }] } }
+                ]
             };
-            const sample2 = {
-                type: "text",
-                text: "รีบจองด่วนนะครับ! 🇯🇵\nโควต้าใกล้เต็มแล้ว"
-            };
+            const sample2 = { type: "text", text: "เลือกได้เลยครับ! 🇯🇵" };
             document.getElementById('jsonInput1').value = JSON.stringify(sample1, null, 2);
             document.getElementById('jsonInput2').value = JSON.stringify(sample2, null, 2);
             document.getElementById('altTextInput').value = "🔥 โปรโมชั่นพิเศษมาแล้ว!";
             previewAll();
         }
 
-        // 🌟 --- ระบบ Render ซ้ายมือ (รองรับ Text/Image/Flex) --- 🌟
+        // 🌟 --- ระบบ Render ซ้ายมือ (แก้ไข Carousel ให้เลื่อนได้แล้ว) --- 🌟
         
         function previewAll() {
             let finalHtml = '';
@@ -321,7 +308,7 @@
                         if (!flex.type && Array.isArray(flex.contents)) flex = { type: 'carousel', contents: flex.contents };
                         if (!flex.type) flex.type = 'bubble';
 
-                        // ใช้ justify-end เพื่อให้ชิดขวาเหมือนข้อความที่ส่งเอง
+                        // ใช้ flex justify-end ครอบชั้นนอกสุด เพื่อชิดขวา
                         finalHtml += `<div class="w-full flex justify-end">${renderFlexToHTML(flex)}</div>`;
                     } catch (e) {
                         finalHtml += `<div class="w-full bg-white p-3 rounded-xl border border-red-300 text-xs text-red-500 shadow-sm">
@@ -348,6 +335,7 @@
                 if (!flex.type && Array.isArray(flex.contents)) flex = { type: 'carousel', contents: flex.contents };
                 if (!flex.type) flex.type = 'bubble';
 
+                // ใช้ flex justify-end ครอบชั้นนอกสุด
                 document.getElementById('previewContent').innerHTML = `<div class="w-full flex justify-end">${renderFlexToHTML(flex)}</div>`;
                 if(window.innerWidth < 768) document.getElementById('previewSide').scrollIntoView({ behavior: 'smooth' });
             } catch (e) {
@@ -358,22 +346,22 @@
         function renderFlexToHTML(flex) {
             if (!flex) return '';
 
-            // 🔥 รองรับพรีวิวข้อความธรรมดา (Text)
             if (flex.type === 'text') {
                 let safeText = flex.text || '';
-                // แปลง \n เป็น <br> เพื่อให้ขึ้นบรรทัดใหม่ได้
                 safeText = safeText.replace(/\n/g, '<br>');
-                return `<div class="bg-[#8ce959] text-black px-4 py-2 rounded-[18px] rounded-tr-[4px] text-sm max-w-[260px] shadow-sm break-words whitespace-pre-wrap ml-auto border border-black/5 leading-[1.4]">${safeText}</div>`;
+                // เอา ml-auto ออก เพราะมี justify-end คลุมอยู่แล้ว
+                return `<div class="bg-[#8ce959] text-black px-4 py-2 rounded-[18px] rounded-tr-[4px] text-sm max-w-[260px] shadow-sm break-words whitespace-pre-wrap border border-black/5 leading-[1.4]">${safeText}</div>`;
             }
 
-            // 🔥 รองรับพรีวิวรูปภาพธรรมดา (Image Message)
             if (flex.type === 'image') {
                 let url = flex.originalContentUrl || flex.previewImageUrl || '';
-                return `<div class="rounded-xl overflow-hidden shadow-sm max-w-[200px] bg-white ml-auto border border-black/5"><img src="${url}" class="w-full h-auto block" alt="image"></div>`;
+                // เอา ml-auto ออก
+                return `<div class="rounded-xl overflow-hidden shadow-sm max-w-[200px] bg-white border border-black/5"><img src="${url}" class="w-full h-auto block" alt="image"></div>`;
             }
             
             if (flex.type === 'carousel') {
-                return `<div class="flex overflow-x-auto gap-2 pb-2 w-full snap-x custom-scroll justify-end">${(flex.contents || []).map(b => renderFlexToHTML(b)).join('')}</div>`;
+                // เปลี่ยน max-w-full เป็น w-full เพื่อให้ใช้พื้นที่เต็มที่ และกำหนด overflow ให้เลื่อนได้
+                return `<div class="flex overflow-x-auto gap-2 pb-2 max-w-full snap-x custom-scroll scroll-smooth">${(flex.contents || []).map(b => renderFlexToHTML(b)).join('')}</div>`;
             }
             
             if (flex.type === 'bubble') {
@@ -387,7 +375,8 @@
                 else if(size === 'mega') width = "280px";
                 else if(size === 'giga') width = "315px";
 
-                let html = `<div class="flex-preview-box flex flex-col flex-shrink-0 snap-center ml-auto" style="width: ${width}; max-width: 100%;">`;
+                // เอา ml-auto ออกจาก bubble (เพื่อไม่ให้พังเวลาอยู่ใน carousel)
+                let html = `<div class="flex-preview-box flex flex-col flex-shrink-0 snap-center" style="width: ${width}; max-width: 100%;">`;
                 if (flex.header) html += renderBox(flex.header);
                 if (flex.hero) html += renderComponent(flex.hero);
                 if (flex.body) html += renderBox(flex.body);
@@ -395,7 +384,7 @@
                 html += `</div>`;
                 return html;
             }
-            return `<div class="bg-white p-4 rounded text-sm text-red-500 shadow-sm ml-auto">พรีวิวไม่รองรับ Message Type นี้ครับ</div>`;
+            return `<div class="bg-white p-4 rounded text-sm text-red-500 shadow-sm">พรีวิวไม่รองรับ Message Type นี้ครับ</div>`;
         }
 
         function renderBox(box) {

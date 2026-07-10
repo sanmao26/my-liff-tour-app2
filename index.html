@@ -14,23 +14,19 @@
         textarea::-webkit-scrollbar-thumb, .custom-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
         textarea::-webkit-scrollbar-thumb:hover, .custom-scroll::-webkit-scrollbar-thumb:hover { background: #bbb; }
         
-        .flex-preview-box { border-radius: 12px; overflow: hidden; background: #fff; width: 100%; max-w: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        /* 🔥 เอา width คงที่ออก เพื่อให้ปรับตามขนาด nano, micro, giga ได้ */
+        .flex-preview-box { border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans flex items-start justify-center p-4 md:p-8">
 
-    <!-- Container หลักแบบ 2 คอลัมน์ -->
     <div class="w-full max-w-5xl flex flex-col md:flex-row gap-6 items-start justify-center">
 
-        <!-- 🌟 ฝั่งซ้าย: หน้าจอ Preview จำลอง (จะซ่อนไว้ก่อนตอนยังไม่ Login) 🌟 -->
         <div id="previewSide" class="hidden w-full md:w-[350px] bg-white rounded-[2rem] shadow-2xl flex-col overflow-hidden sticky top-8 border-[6px] border-gray-800 h-[650px] shrink-0">
-            <!-- หัวหน้าจอจำลอง -->
             <div class="bg-gray-800 text-white flex justify-between items-center px-4 py-2">
                 <span class="text-xs font-bold">12:00</span>
                 <div class="flex gap-1 text-[10px]">
-                    <i class="fas fa-signal"></i>
-                    <i class="fas fa-wifi"></i>
-                    <i class="fas fa-battery-full"></i>
+                    <i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i>
                 </div>
             </div>
             <div class="bg-slate-800 text-white px-4 py-3 flex items-center gap-2 shadow-md z-10 relative">
@@ -38,12 +34,10 @@
                 <span class="font-bold text-sm">LINE Preview</span>
             </div>
             
-            <!-- พื้นที่แชทจำลอง -->
             <div class="bg-[#749bb6] flex-1 p-4 flex flex-col items-center overflow-y-auto custom-scroll relative">
                 <div class="text-center text-white/40 text-[10px] mb-4 bg-black/10 px-3 py-1 rounded-full">วันนี้</div>
                 
                 <div id="previewContent" class="w-full flex justify-start pb-8">
-                    <!-- โค้ด HTML จำลองจะมาโผล่ตรงนี้ -->
                     <div class="w-full text-center text-white/60 text-xs mt-20 flex flex-col items-center gap-2">
                         <i class="fas fa-eye text-3xl mb-2"></i>
                         <p>กดปุ่ม "ดูตัวอย่าง" ที่กล่องข้อความ</p>
@@ -52,7 +46,6 @@
                 </div>
             </div>
             
-            <!-- แป้นพิมพ์จำลองด้านล่าง -->
             <div class="bg-gray-100 p-3 flex items-center gap-2 border-t border-gray-200">
                 <i class="fas fa-plus text-gray-400"></i>
                 <div class="flex-1 bg-white rounded-full h-8 border border-gray-300"></div>
@@ -61,8 +54,6 @@
             </div>
         </div>
 
-
-        <!-- 🌟 ฝั่งขวา: เครื่องมือหลัก (Flex Sender) 🌟 -->
         <div class="w-full max-w-md bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col">
             
             <div class="bg-[#06c755] p-4 text-white flex justify-between items-center shadow-md z-10">
@@ -70,7 +61,6 @@
                 <div id="userStatus" class="text-xs bg-white/20 px-2 py-1 rounded">Guest</div>
             </div>
 
-            <!-- Login Screen -->
             <div id="loginScreen" class="flex flex-col items-center justify-center p-12 text-center h-[500px]">
                 <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                     <i class="fas fa-user-lock text-4xl text-gray-400"></i>
@@ -81,7 +71,6 @@
                 </button>
             </div>
 
-            <!-- App Screen -->
             <div id="appScreen" class="flex-col p-4 gap-4 hidden overflow-y-auto max-h-[85vh] custom-scroll">
                 
                 <div class="flex items-center gap-3 bg-blue-50 p-2 rounded-lg border border-blue-100 mb-4">
@@ -93,13 +82,11 @@
                     <button onclick="logout()" class="text-xs text-red-500 underline">ออก</button>
                 </div>
 
-                <!-- Database Section -->
                 <div class="bg-indigo-50 p-3 rounded-xl border border-indigo-200 shadow-sm mb-4">
                     <div class="flex justify-between items-center mb-2">
                         <h3 class="text-xs font-bold text-indigo-800"><i class="fas fa-save"></i> คลังข้อความของฉัน</h3>
                         <span id="saveCount" class="text-[10px] bg-indigo-200 text-indigo-800 px-2 py-0.5 rounded-full">0 รายการ</span>
                     </div>
-                    
                     <div class="flex gap-2 mb-3">
                         <select id="savedTemplates" class="flex-1 text-xs border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500 bg-white">
                             <option value="">-- เลือกรายการที่บันทึกไว้ --</option>
@@ -107,14 +94,12 @@
                         <button onclick="loadTemplate()" class="bg-indigo-600 text-white text-xs px-3 py-1.5 rounded hover:bg-indigo-700">โหลด</button>
                         <button onclick="deleteTemplate()" class="bg-red-500 text-white text-xs px-3 py-1.5 rounded hover:bg-red-600"><i class="fas fa-trash"></i></button>
                     </div>
-
                     <div class="flex gap-2 border-t border-indigo-200 pt-2">
                         <input type="text" id="saveName" placeholder="ตั้งชื่องาน (เช่น โปรวันแม่)" class="flex-1 text-xs border border-indigo-300 rounded px-2 py-1.5 focus:outline-none focus:border-indigo-500">
                         <button onclick="saveTemplate()" class="bg-green-600 text-white text-xs px-3 py-1.5 rounded hover:bg-green-700">บันทึกใหม่</button>
                     </div>
                 </div>
 
-                <!-- Alt Text -->
                 <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200 mb-4">
                     <label class="text-xs font-bold text-yellow-800 block mb-1">
                         <i class="fas fa-comment-dots"></i> ข้อความแจ้งเตือน (Alt Text)
@@ -122,14 +107,12 @@
                     <input type="text" id="altTextInput" placeholder="Ex. โปรโมชั่นใหม่มาแล้ว!" class="w-full border border-yellow-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-yellow-500 bg-white">
                 </div>
 
-                <!-- 5 Input Boxes -->
                 <div class="space-y-4 pb-4">
                     <div class="flex justify-end gap-2">
                         <button onclick="loadSample()" class="text-[10px] text-gray-500 underline">โหลดตัวอย่างโค้ด</button>
                         <button onclick="clearAllJson()" class="text-[10px] text-red-500 underline">ล้างช่องทั้งหมด</button>
                     </div>
 
-                    <!-- Box 1 -->
                     <div>
                         <div class="flex justify-between items-center mb-1">
                             <span class="bg-gray-700 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 1 (หลัก)</span>
@@ -138,20 +121,17 @@
                         <textarea id="jsonInput1" class="w-full border-2 border-gray-200 rounded-lg p-3 text-xs font-mono h-32 focus:border-[#06c755] focus:ring-1 focus:ring-[#06c755]" placeholder='วาง JSON หลักที่นี่...'></textarea>
                     </div>
 
-                    <!-- Box 2-5 -->
                     <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 2</span><button onclick="previewFlex(2)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded border border-blue-200"><i class="fas fa-eye"></i> ดูตัวอย่าง</button></div><textarea id="jsonInput2" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
                     <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 3</span><button onclick="previewFlex(3)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded border border-blue-200"><i class="fas fa-eye"></i> ดูตัวอย่าง</button></div><textarea id="jsonInput3" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
                     <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 4</span><button onclick="previewFlex(4)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded border border-blue-200"><i class="fas fa-eye"></i> ดูตัวอย่าง</button></div><textarea id="jsonInput4" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
                     <div><div class="flex justify-between items-center mb-1"><span class="bg-gray-400 text-white text-[10px] px-2 py-0.5 rounded">ข้อความที่ 5</span><button onclick="previewFlex(5)" class="text-[10px] text-blue-600 hover:text-blue-800 font-bold bg-blue-100 px-2 py-0.5 rounded border border-blue-200"><i class="fas fa-eye"></i> ดูตัวอย่าง</button></div><textarea id="jsonInput5" class="w-full border border-gray-300 rounded-lg p-3 text-xs font-mono h-24 focus:border-[#06c755]" placeholder='(ไม่บังคับ)'></textarea></div>
                 </div>
 
-                <!-- Submit Button -->
                 <div class="sticky bottom-0 bg-white/90 p-2 backdrop-blur-sm border-t border-gray-100">
                     <button onclick="sendFlex()" class="w-full bg-[#06c755] hover:bg-[#05b34c] text-white font-bold py-3 rounded-lg shadow-lg text-lg flex justify-center items-center gap-2 transition-all active:scale-95">
                         <i class="fas fa-paper-plane"></i> ส่งทั้งหมด
                     </button>
                 </div>
-
             </div>
 
             <div id="loadingScreen" class="flex flex-col items-center justify-center p-12 h-[500px]">
@@ -159,7 +139,6 @@
                 <p class="text-gray-400 text-sm">กำลังโหลด...</p>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -239,11 +218,8 @@
         async function displayApp() {
             document.getElementById('loadingScreen').classList.add('hidden');
             document.getElementById('loginScreen').classList.add('hidden');
-            // เอา display: flex มาแทน hidden
             document.getElementById('appScreen').classList.remove('hidden');
             document.getElementById('appScreen').classList.add('flex');
-            
-            // โชว์หน้าจอซ้ายด้วยเมื่อ Login แล้ว
             document.getElementById('previewSide').classList.remove('hidden');
             document.getElementById('previewSide').classList.add('flex');
 
@@ -305,6 +281,7 @@
         function loadSample() {
             const sample = { 
                 type: "bubble", 
+                size: "mega",
                 hero: { type: "image", url: "https://i.postimg.cc/9QK80cTC/49842843731-41506214783-1747639625-988650243-f.jpg", size: "full", aspectRatio: "20:13", aspectMode: "cover" },
                 body: { type: "box", layout: "vertical", contents: [
                     { type: "text", text: "โปรโมชั่นพิเศษ!", weight: "bold", size: "xl", color: "#ff0000" },
@@ -316,10 +293,10 @@
             };
             document.getElementById('jsonInput1').value = JSON.stringify(sample, null, 2);
             document.getElementById('altTextInput').value = "🔥 โปรโมชั่นพิเศษมาแล้ว!";
-            previewFlex(1); // สั่งพรีวิวให้อัตโนมัติด้วย
+            previewFlex(1); 
         }
 
-        // 🌟 --- ระบบ Render ซ้ายมือ --- 🌟
+        // 🌟 --- ระบบ Render ซ้ายมือ (อัปเกรดแล้ว!) --- 🌟
         function previewFlex(index) {
             const raw = document.getElementById('jsonInput' + index).value.trim();
             if (!raw) return alert("กรุณาวางโค้ด JSON ก่อนกดพรีวิวครับ");
@@ -329,10 +306,8 @@
                 if (flex.type === "flex" && flex.contents) flex = flex.contents;
                 const html = renderFlexToHTML(flex);
                 
-                // นำไปแปะทางซ้ายมือ
                 document.getElementById('previewContent').innerHTML = html;
 
-                // ถ้าเปิดในมือถือ (จอเล็ก) ให้เลื่อนหน้าจอขึ้นไปดูข้างบน
                 if(window.innerWidth < 768) {
                     document.getElementById('previewSide').scrollIntoView({ behavior: 'smooth' });
                 }
@@ -341,7 +316,7 @@
             }
         }
 
-        // ตัวแปลง JSON เป็น HTML (รองรับ Bubble และ Carousel)
+        // ตัวแปลง JSON เป็น HTML
         function renderFlexToHTML(flex) {
             if (!flex) return '';
             
@@ -350,7 +325,17 @@
             }
             
             if (flex.type === 'bubble') {
-                let html = `<div class="flex-preview-box flex flex-col flex-shrink-0 snap-center">`;
+                // 🔥 ระบบคำนวณขนาดการ์ดตาม size (nano - giga)
+                let width = "280px"; // ค่า default = mega
+                if(flex.size === 'nano') width = "120px";
+                else if(flex.size === 'micro') width = "160px";
+                else if(flex.size === 'deca') width = "190px";
+                else if(flex.size === 'hecto') width = "210px";
+                else if(flex.size === 'kilo') width = "240px";
+                else if(flex.size === 'mega') width = "280px";
+                else if(flex.size === 'giga') width = "320px";
+
+                let html = `<div class="flex-preview-box flex flex-col flex-shrink-0 snap-center" style="width: ${width}; max-width: 100%;">`;
                 if (flex.header) html += renderBox(flex.header);
                 if (flex.hero) html += renderComponent(flex.hero);
                 if (flex.body) html += renderBox(flex.body);
@@ -368,7 +353,10 @@
             let layoutCls = isRow ? 'flex flex-row items-center' : 'flex flex-col';
             let bg = box.backgroundColor ? `background-color: ${box.backgroundColor};` : '';
             
-            let html = `<div class="${layoutCls} p-3 gap-2" style="${bg}">`;
+            let p = 'p-3'; 
+            if(box.paddingAll === '0px' || box.paddingAll === 'none') p = 'p-0';
+            
+            let html = `<div class="${layoutCls} ${p} gap-2" style="${bg}">`;
             if (box.contents) {
                 box.contents.forEach(c => { html += renderComponent(c); });
             }
@@ -382,11 +370,20 @@
                 let weight = c.weight === 'bold' ? 'font-bold' : 'font-normal';
                 let color = c.color || '#111111';
                 let align = c.align === 'center' ? 'text-center' : c.align === 'end' ? 'text-right' : 'text-left';
+                
+                // 🔥 ระบบคำนวณขนาดตัวอักษรแบบละเอียด
                 let sizeClass = 'text-sm';
-                if(c.size === 'xs' || c.size === 'sm') sizeClass = 'text-xs';
-                if(c.size === 'lg') sizeClass = 'text-base';
-                if(c.size === 'xl') sizeClass = 'text-lg';
-                if(c.size === 'xxl' || c.size === '3xl') sizeClass = 'text-xl';
+                if(c.size === 'xxs') sizeClass = 'text-[10px]';
+                else if(c.size === 'xs') sizeClass = 'text-xs';
+                else if(c.size === 'sm') sizeClass = 'text-[13px]';
+                else if(c.size === 'md') sizeClass = 'text-sm';
+                else if(c.size === 'lg') sizeClass = 'text-base';
+                else if(c.size === 'xl') sizeClass = 'text-lg';
+                else if(c.size === 'xxl') sizeClass = 'text-xl';
+                else if(c.size === '3xl') sizeClass = 'text-2xl';
+                else if(c.size === '4xl') sizeClass = 'text-3xl';
+                else if(c.size === '5xl') sizeClass = 'text-4xl';
+
                 let wrap = c.wrap ? 'whitespace-normal' : 'truncate';
                 return `<div class="${weight} ${align} ${sizeClass} ${wrap} flex-1" style="color: ${color}">${c.text||''}</div>`;
             }

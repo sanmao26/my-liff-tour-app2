@@ -108,7 +108,7 @@
                     <label class="text-xs font-bold text-yellow-800 block mb-1">
                         <i class="fas fa-comment-dots"></i> ข้อความแจ้งเตือน (Alt Text)
                     </label>
-                    <input type="text" id="altTextInput" placeholder="Ex. โปรโมชั่นใหม่มาแล้ว!" class="w-full border border-yellow-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-yellow-500 bg-white">
+                    <input type="text" id="altTextInput" placeholder="Ex. โปรโมชั่นใหม่มาแล้ว! (จำเป็นต้องใส่)" class="w-full border border-yellow-400 rounded px-2 py-1.5 text-sm focus:outline-none focus:border-yellow-600 bg-white shadow-inner">
                 </div>
 
                 <div class="space-y-4 pb-4">
@@ -252,14 +252,21 @@
             let messagesToSend = [];
             const globalAltText = document.getElementById('altTextInput').value.trim();
 
+            // 🔥 เพิ่มเงื่อนไขตรวจสอบบังคับให้กรอก Alt Text
+            if (!globalAltText) {
+                // โฟกัสไปที่กล่องข้อความให้ลูกค้าเห็นชัดๆ
+                document.getElementById('altTextInput').focus();
+                return alert("⚠️ กรุณาใส่ 'ข้อความแจ้งเตือน (Alt Text)' ด้านบนก่อนกดส่งครับ");
+            }
+
             for(let i=1; i<=5; i++) {
                 const raw = document.getElementById('jsonInput'+i).value.trim();
                 if(raw) {
                     try {
                         let parsed = JSON.parse(raw);
                         if (parsed.type === "bubble" || parsed.type === "carousel") {
-                            parsed = { type: "flex", altText: globalAltText || "Flex Message", contents: parsed };
-                        } else if (parsed.type === "flex" && globalAltText) {
+                            parsed = { type: "flex", altText: globalAltText, contents: parsed };
+                        } else if (parsed.type === "flex") {
                             parsed.altText = globalAltText;
                         }
                         messagesToSend.push(parsed);
